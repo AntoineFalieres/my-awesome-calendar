@@ -124,13 +124,17 @@ def get_holidays(country_code, year):
         return jsonify({'error': 'Year must be between 1900 and 2200'}), 400
     
     try:
-        country_holidays = holidays.country_holidays(country_code, years=year, subdiv=subdiv)
+        kwargs = {'years': year}
+        if subdiv:
+            kwargs['subdiv'] = subdiv
+        
+        country_holidays = holidays.country_holidays(country_code, **kwargs)
         
         events = []
-        for holiday_date, holiday_name in sorted(country_holidays.items()):
+        for holiday_date_obj, holiday_name in sorted(country_holidays.items()):
             events.append({
                 'title': holiday_name,
-                'start': holiday_date.strftime('%Y-%m-%d')
+                'start': holiday_date_obj.strftime('%Y-%m-%d')
             })
         
         return jsonify(events)
