@@ -89,27 +89,31 @@
         }
 
         async function loadCountries() {
-            const response = await fetch("/api/countries");
-            if (!response.ok) {
-                throw new Error("Failed to fetch countries");
-            }
-            const countries = await response.json();
+            try {
+                const response = await fetch("/api/countries");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch countries");
+                }
+                const countries = await response.json();
 
-            countrySelect.innerHTML = "";
-            Object.entries(countries)
-                .sort((a, b) => a[1].localeCompare(b[1]))
-                .forEach(([code, name]) => {
-                    const option = document.createElement("option");
-                    option.value = code;
-                    option.textContent = `${name} (${code})`;
-                    countrySelect.appendChild(option);
-                });
+                countrySelect.innerHTML = "";
+                Object.entries(countries)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .forEach(([code, name]) => {
+                        const option = document.createElement("option");
+                        option.value = code;
+                        option.textContent = `${name} (${code})`;
+                        countrySelect.appendChild(option);
+                    });
 
-            const usOption = Array.from(countrySelect.options).find(
-                (opt) => opt.value === "US"
-            );
-            if (usOption) {
-                countrySelect.value = "US";
+                const usOption = Array.from(countrySelect.options).find(
+                    (opt) => opt.value === "US"
+                );
+                if (usOption) {
+                    countrySelect.value = "US";
+                }
+            } catch (error) {
+                console.error("Error loading countries:", error);
             }
         }
 
@@ -151,51 +155,53 @@
             }
 
             try {
-                const url = new URL(`/api/holidays/${countryCode}/${year}`, window.location.origin);
-                const zone = document.getElementById("zone-select").value;
-                if (countryCode === "FR") {
-                    url.searchParams.append("subdiv", "");
-                }
-                
-                const response = await fetch(url.toString());
+                const allEvents = [];
+
+                const url = `/api/holidays/${countryCode}/${year}`;
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error("Failed to fetch holidays");
                 }
 
                 const holidays = await response.json();
-                calendar.removeAllEvents();
-                calendar.addEventSource(holidays);
+                allEvents.push(...holidays);
 
-                // Add school holidays for France
                 if (countryCode === "FR") {
-                    const schoolResponse = await fetch(`/api/school-holidays/${countryCode}/${year}?zone=${zone}`);
+                    const zone = document.getElementById("zone-select").value;
+                    const schoolUrl = `/api/school-holidays/${countryCode}/${year}?zone=${zone}`;
+                    const schoolResponse = await fetch(schoolUrl);
                     if (schoolResponse.ok) {
                         const schoolHolidays = await schoolResponse.json();
-                        calendar.addEventSource(schoolHolidays);
+                        allEvents.push(...schoolHolidays);
                     }
                 }
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(allEvents);
             } catch (error) {
-                throw error;
+                console.error("Error loading holidays:", error);
             }
         }
 
         async function initializePage() {
-            populateYearDropdown();
-            initializeCalendar();
-            await loadCountries();
-            await refreshHolidays();
+            try {
+                populateYearDropdown();
+                initializeCalendar();
+                await loadCountries();
+                await refreshHolidays();
 
-            countrySelect.addEventListener("change", () => {
-                toggleZoneSelector();
-                refreshHolidays();
-            });
-            yearSelect.addEventListener("change", refreshHolidays);
-            document.getElementById("zone-select").addEventListener("change", refreshHolidays);
+                countrySelect.addEventListener("change", () => {
+                    toggleZoneSelector();
+                    refreshHolidays();
+                });
+                yearSelect.addEventListener("change", refreshHolidays);
+                document.getElementById("zone-select").addEventListener("change", refreshHolidays);
+            } catch (error) {
+                console.error("Error initializing page:", error);
+            }
         }
 
-        initializePage().catch((error) => {
-            console.error(error);
-        });
+        initializePage();
     </script>
 </body>
 </html>
