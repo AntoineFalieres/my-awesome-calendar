@@ -41,6 +41,9 @@
                     <option value="">Select Country</option>
                 </select>
                 <select id="year-select" class="form-select" aria-label="Year"></select>
+                <select id="subdivision-select" class="form-select d-none" aria-label="Subdivision">
+                    <option value="">Select Subdivision</option>
+                </select>
                 <select id="zone-select" class="form-select d-none" aria-label="Zone">
                     <option value="A">Zone A</option>
                     <option value="B">Zone B</option>
@@ -72,6 +75,8 @@
     <script>
         const countrySelect = document.getElementById("country-select");
         const yearSelect = document.getElementById("year-select");
+        const subdivisionSelect = document.getElementById("subdivision-select");
+        const zoneSelect = document.getElementById("zone-select");
         const currentYear = new Date().getFullYear();
         let calendar;
 
@@ -135,13 +140,51 @@
             calendar.render();
         }
 
-        function toggleZoneSelector() {
+        async function loadSubdivisions() {
             const countryCode = countrySelect.value;
-            const zoneSelect = document.getElementById("zone-select");
+            subdivisionSelect.innerHTML = '<option value="">Select Subdivision</option>';
+            subdivisionSelect.classList.add("d-none");
+            
+            if (!countryCode) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/subdivisions/${countryCode}`);
+                if (!response.ok) {
+                    console.warn("No subdivisions for this country");
+                    return;
+                }
+                const subdivisions = await response.json();
+                
+                if (Object.keys(subdivisions).length === 0) {
+                    return;
+                }
+
+                Object.entries(subdivisions).forEach(([code, name]) => {
+                    const option = document.createElement("option");
+                    option.value = code;
+                    option.textContent = name;
+                    subdivisionSelect.appendChild(option);
+                });
+
+                subdivisionSelect.classList.remove("d-none");
+            } catch (error) {
+                console.error("Error loading subdivisions:", error);
+            }
+        }
+
+        function toggleSelectors() {
+            const countryCode = countrySelect.value;
+            
+            // Show zone selector only for France
             if (countryCode === "FR") {
                 zoneSelect.classList.remove("d-none");
+                subdivisionSelect.classList.add("d-none");
             } else {
                 zoneSelect.classList.add("d-none");
+                // Load subdivisions for other countries
+                loadSubdivisions();
             }
         }
 
@@ -157,7 +200,13 @@
             try {
                 const allEvents = [];
 
-                const holidayUrl = `/api/holidays/${countryCode}/${year}`;
+                // Build URL with optional subdiv parameter
+                let holidayUrl = `/api/holidays/${countryCode}/${year}`;
+                const subdiv = subdivisionSelect.value || zoneSelect.value;
+                if (subdiv) {
+                    holidayUrl += `?subdiv=${subdiv}`;
+                }
+
                 const response = await fetch(holidayUrl);
                 if (!response.ok) {
                     console.error("Failed to fetch holidays:", response.statusText);
@@ -167,8 +216,8 @@
                 const holidays = await response.json();
                 allEvents.push(...holidays);
 
-                if (countryCode === "FR") {
-                    const zone = document.getElementById("zone-select").value;
+                if (countryCode === "FR" && zoneSelect.value) {
+                    const zone = zoneSelect.value;
                     const schoolUrl = `/api/school-holidays/${countryCode}/${year}?zone=${zone}`;
                     const schoolResponse = await fetch(schoolUrl);
                     if (schoolResponse.ok) {
@@ -195,11 +244,12 @@
             refreshHolidays();
 
             countrySelect.addEventListener("change", () => {
-                toggleZoneSelector();
+                toggleSelectors();
                 refreshHolidays();
             });
             yearSelect.addEventListener("change", refreshHolidays);
-            document.getElementById("zone-select").addEventListener("change", refreshHolidays);
+            subdivisionSelect.addEventListener("change", refreshHolidays);
+            zoneSelect.addEventListener("change", refreshHolidays);
         }
 
         // Wait for DOM to be ready
