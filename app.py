@@ -1,10 +1,25 @@
 from flask import Flask, render_template, jsonify
+import re
+
 import holidays
+from holidays.registry import COUNTRIES as HOLIDAY_COUNTRIES
 
 app = Flask(__name__)
 
 # Mapping of country codes to human-readable country names
+
+def _humanize_entity_name(entity_name):
+    return re.sub(r"(?<!^)(?=[A-Z])", " ", entity_name)
+
+AUTO_COUNTRY_NAMES = {
+    code: _humanize_entity_name(entity_tuple[0])
+    for entity_tuple in HOLIDAY_COUNTRIES.values()
+    for code in entity_tuple[1:]
+    if 2 <= len(code) <= 3
+}
+
 COUNTRY_NAMES = {
+    **AUTO_COUNTRY_NAMES,
     'AD': 'Andorra', 'AE': 'United Arab Emirates', 'AL': 'Albania', 'AM': 'Armenia',
     'AO': 'Angola', 'AR': 'Argentina', 'AT': 'Austria', 'AU': 'Australia',
     'AZ': 'Azerbaijan', 'BA': 'Bosnia and Herzegovina', 'BB': 'Barbados', 'BE': 'Belgium',
