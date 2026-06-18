@@ -92,6 +92,17 @@ FR_SCHOOL_HOLIDAYS_ZONES = {
 }
 
 
+def get_country_subdivisions(country_code):
+    """Get subdivisions available for a country."""
+    try:
+        country_holidays = holidays.country_holidays(country_code, years=2026)
+        if hasattr(country_holidays, 'subdivisions') and country_holidays.subdivisions:
+            return dict(country_holidays.subdivisions)
+        return {}
+    except:
+        return {}
+
+
 @app.route('/')
 def index():
     """Serve the main index.html template."""
@@ -109,6 +120,18 @@ def get_countries():
         countries_dict[country_code] = country_name
     
     return jsonify(countries_dict)
+
+
+@app.route('/api/subdivisions/<country_code>')
+def get_subdivisions(country_code):
+    """Return available subdivisions for a country."""
+    supported_countries = holidays.list_supported_countries()
+    
+    if country_code not in supported_countries:
+        return jsonify({'error': f'Invalid country code: {country_code}'}), 400
+    
+    subdivisions = get_country_subdivisions(country_code)
+    return jsonify(subdivisions)
 
 
 @app.route('/api/holidays/<country_code>/<int:year>')
