@@ -57,6 +57,48 @@ def index():
     return render_template('index.html')
 
 
+
+
+# French school holidays by zone (https://www.education.gouv.fr/calendrier-scolaire)
+FR_SCHOOL_HOLIDAYS_ZONES = {
+    'A': {
+        '2025': [
+            ('2025-02-15', '2025-03-03'),
+            ('2025-04-12', '2025-04-28'),
+            ('2025-07-06', '2025-09-01'),
+        ],
+        '2026': [
+            ('2026-02-14', '2026-03-02'),
+            ('2026-04-11', '2026-04-27'),
+            ('2026-07-05', '2026-08-31'),
+        ],
+    },
+    'B': {
+        '2025': [
+            ('2025-02-01', '2025-02-17'),
+            ('2025-04-05', '2025-04-21'),
+            ('2025-07-06', '2025-09-01'),
+        ],
+        '2026': [
+            ('2026-02-07', '2026-02-23'),
+            ('2026-04-04', '2026-04-20'),
+            ('2026-07-05', '2026-08-31'),
+        ],
+    },
+    'C': {
+        '2025': [
+            ('2025-02-08', '2025-02-24'),
+            ('2025-04-19', '2025-05-05'),
+            ('2025-07-06', '2025-09-01'),
+        ],
+        '2026': [
+            ('2026-02-21', '2026-03-09'),
+            ('2026-04-18', '2026-05-04'),
+            ('2026-07-05', '2026-08-31'),
+        ],
+    },
+}
+
 @app.route('/api/countries')
 def get_countries():
     """Return all supported countries with their names."""
@@ -73,6 +115,9 @@ def get_countries():
 @app.route('/api/holidays/<country_code>/<int:year>')
 def get_holidays(country_code, year):
     """Return holidays for a specific country and year in FullCalendar.js format."""
+    from flask import request
+    subdiv = request.args.get('subdiv')
+    
     supported_countries = holidays.list_supported_countries()
     
     if country_code not in supported_countries:
@@ -82,18 +127,48 @@ def get_holidays(country_code, year):
         return jsonify({'error': 'Year must be between 1900 and 2200'}), 400
     
     try:
-        country_holidays = holidays.country_holidays(country_code, years=year)
+        country_holidays = holidays.country_holidays(country_code, years=year, subdiv=subdiv)
         
         events = []
-        for date, holiday_name in sorted(country_holidays.items()):
+        for holiday_date, holiday_name in sorted(country_holidays.items()):
             events.append({
                 'title': holiday_name,
-                'start': date.strftime('%Y-%m-%d')
+                'start': holiday_date.strftime('%Y-%m-%d')
             })
         
         return jsonify(events)
     except Exception as e:
         return jsonify({'error': f'Failed to retrieve holidays: {str(e)}'}), 400
+
+@app.route('/api/school-holidays/<country_code>/<int:year>')
+def get_school_holidays(country_code, year):
+    """Return school holidays for a country and year."""
+    from flask import request
+    zone = request.args.get('zone', 'A')
+    
+    if country_code != 'FR':
+        return jsonify({'error': 'School holidays only available for France'}), 400
+    
+    if zone not in ['A', 'B', 'C']:
+        return jsonify({'error': 'Zone must be A, B, or C'}), 400
+    
+    year_str = str(year)
+    if year_str not in FR_SCHOOL_HOLIDAYS_ZONES.get(zone, {}):
+        return jsonify({'error': f'School holidays data not available for {year}'}), 400
+    
+    events = []
+    for start_str, end_str in FR_SCHOOL_HOLIDAYS_ZONES[zone][year_str]:
+        start_date = date.fromisoformat(start_str)
+        end_date = date.fromisoformat(end_str)
+        # Create a single event with duration or add daily events
+        events.append({
+            'title': f'School holidays (Zone {zone})',
+            'start': start_str,
+            'end': end_str,
+            'backgroundColor': '#ff6b6b'
+        })
+    
+    return jsonify(events)
 
 
 if __name__ == '__main__':
