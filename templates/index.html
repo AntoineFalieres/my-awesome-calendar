@@ -41,6 +41,11 @@
                     <option value="">Select Country</option>
                 </select>
                 <select id="year-select" class="form-select" aria-label="Year"></select>
+                <select id="zone-select" class="form-select d-none" aria-label="Zone">
+                    <option value="A">Zone A</option>
+                    <option value="B">Zone B</option>
+                    <option value="C">Zone C</option>
+                </select>
             </div>
         </div>
     </nav>
@@ -126,6 +131,16 @@
             calendar.render();
         }
 
+        function toggleZoneSelector() {
+            const countryCode = countrySelect.value;
+            const zoneSelect = document.getElementById("zone-select");
+            if (countryCode === "FR") {
+                zoneSelect.classList.remove("d-none");
+            } else {
+                zoneSelect.classList.add("d-none");
+            }
+        }
+
         async function refreshHolidays() {
             const countryCode = countrySelect.value;
             const year = yearSelect.value;
@@ -135,14 +150,33 @@
                 return;
             }
 
-            const response = await fetch(`/api/holidays/${countryCode}/${year}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch holidays");
-            }
+            try {
+                const url = new URL(`/api/holidays/${countryCode}/${year}`, window.location.origin);
+                const zone = document.getElementById("zone-select").value;
+                if (countryCode === "FR") {
+                    url.searchParams.append("subdiv", "");
+                }
+                
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    throw new Error("Failed to fetch holidays");
+                }
 
-            const holidays = await response.json();
-            calendar.removeAllEvents();
-            calendar.addEventSource(holidays);
+                const holidays = await response.json();
+                calendar.removeAllEvents();
+                calendar.addEventSource(holidays);
+
+                // Add school holidays for France
+                if (countryCode === "FR") {
+                    const schoolResponse = await fetch(`/api/school-holidays/${countryCode}/${year}?zone=${zone}`);
+                    if (schoolResponse.ok) {
+                        const schoolHolidays = await schoolResponse.json();
+                        calendar.addEventSource(schoolHolidays);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
         }
 
         async function initializePage() {
@@ -151,8 +185,12 @@
             await loadCountries();
             await refreshHolidays();
 
-            countrySelect.addEventListener("change", refreshHolidays);
+            countrySelect.addEventListener("change", () => {
+                toggleZoneSelector();
+                refreshHolidays();
+            });
             yearSelect.addEventListener("change", refreshHolidays);
+            document.getElementById("zone-select").addEventListener("change", refreshHolidays);
         }
 
         initializePage().catch((error) => {
