@@ -149,6 +149,12 @@ Returns school holidays for France by zone.
 ]
 ```
 
+#### GET `/mentions-legales`
+Returns the legal notice page (placeholder content).
+
+#### GET `/privacy-policy`
+Returns the privacy policy page (placeholder content).
+
 ## 🗃️ Project Structure
 
 ```
@@ -157,7 +163,9 @@ my-awesome-calendar/
 ├── requirements.txt       # Python dependencies
 ├── README.md             # This file
 ├── templates/
-│   └── index.html        # Main frontend (FullCalendar + Bootstrap)
+│   ├── index.html        # Main frontend (FullCalendar + Bootstrap)
+│   ├── mentions_legales.html  # Legal notice page
+│   └── privacy_policy.html    # Privacy policy page
 └── SETUP.md             # Detailed setup instructions
 ```
 
