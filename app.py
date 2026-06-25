@@ -109,6 +109,18 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/mentions-legales')
+def mentions_legales():
+    """Serve the Mentions Légales page."""
+    return render_template('mentions_legales.html')
+
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    """Serve the Privacy Policy page."""
+    return render_template('privacy_policy.html')
+
+
 @app.route('/api/countries')
 def get_countries():
     """Return all supported countries with their names."""
