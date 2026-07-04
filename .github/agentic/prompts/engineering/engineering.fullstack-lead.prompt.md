@@ -1,0 +1,4 @@
+---
+agent: engineering.fullstack-lead
+---
+

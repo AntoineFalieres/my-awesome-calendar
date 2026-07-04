@@ -1,0 +1,3 @@
+---
+agent: ads.monetization-optimizer
+---
