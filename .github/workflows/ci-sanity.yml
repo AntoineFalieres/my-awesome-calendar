@@ -1,0 +1,99 @@
+name: CI Sanity
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  code-sanity:
+    name: Code sanity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: python -m py_compile app.py
+
+      - name: Validate app imports
+        run: python -c "import app"
+
+  website-sanity:
+    name: Website sanity
+    runs-on: ubuntu-latest
+    needs: code-sanity
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start app and check key routes
+        run: |
+          python -c "from app import app; app.run(host='127.0.0.1', port=5000, debug=False)" > app.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID' EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5000/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsS http://127.0.0.1:5000/ > /dev/null
+          curl -fsS http://127.0.0.1:5000/api/countries > /tmp/countries.json
+          python -c "import json; data=json.load(open('/tmp/countries.json')); assert isinstance(data, dict) and 'US' in data"
+
+          curl -fsS "http://127.0.0.1:5000/api/holidays/US/2026" > /tmp/holidays.json
+          python -c "import json; data=json.load(open('/tmp/holidays.json')); assert isinstance(data, list)"
+
+  deployment-sanity:
+    name: Deployment sanity
+    runs-on: ubuntu-latest
+    needs: code-sanity
+    env:
+      PORT: "8000"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start app in production-like mode
+        run: |
+          python -c "import os; from app import app; app.run(host='0.0.0.0', port=int(os.environ['PORT']), debug=False)" > app.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID' EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:${PORT}/" > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsS "http://127.0.0.1:${PORT}/" > /dev/null
