@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holiday Calendar</title>
-    <!-- GDPR cookie consent banner script placeholder -->
-
+    <title>France Holidays Calendar</title>
+    <meta
+        name="description"
+        content="Explore France public holidays and school holidays by year and zone in a fast, mobile-first calendar."
+    >
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        crossorigin="anonymous"
+    ></script>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -14,64 +21,173 @@
         href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
         rel="stylesheet"
     >
-
     <style>
-        #ad-leaderboard {
-            background-color: #f0f0f0;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        :root {
+            color-scheme: light;
         }
 
-        #ad-sidebar {
-            background-color: #f0f0f0;
-            min-height: 600px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .calendar-shell {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 1rem;
+        }
+
+        .ad-slot {
+            background: #eef2f7;
+            border: 1px dashed #b8c2d1;
+            border-radius: 0.5rem;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .ad-slot .adsbygoogle {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ad-slot-fallback {
+            background: #f1f3f7;
+            border-color: #d4dbe8;
+        }
+
+        .ad-slot-header {
+            min-height: 90px;
+        }
+
+        .ad-slot-inline {
+            min-height: 120px;
+        }
+
+        .ad-slot-footer {
+            min-height: 100px;
+        }
+
+        .month-card {
+            background: #ffffff;
+            border: 1px solid #e4e8ef;
+            border-radius: 0.75rem;
+            padding: 0.875rem;
+            margin-bottom: 0.875rem;
+        }
+
+        .month-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .holiday-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .holiday-item {
+            border-top: 1px solid #edf0f5;
+            padding: 0.55rem 0;
+        }
+
+        .holiday-item:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .holiday-date {
+            color: #0d6efd;
+            font-weight: 600;
+            margin-right: 0.45rem;
+        }
+
+        @media (min-width: 768px) {
+            .calendar-shell {
+                padding: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Holiday Calendar</a>
-            <div class="d-flex flex-column flex-md-row gap-2 ms-auto">
-                <select id="country-select" class="form-select" aria-label="Country">
-                    <option value="">Select Country</option>
-                </select>
-                <select id="year-select" class="form-select" aria-label="Year"></select>
-                <select id="subdivision-select" class="form-select d-none" aria-label="Subdivision">
-                    <option value="">Select Subdivision</option>
-                </select>
-                <select id="zone-select" class="form-select d-none" aria-label="Zone">
-                    <option value="A">Zone A</option>
-                    <option value="B">Zone B</option>
-                    <option value="C">Zone C</option>
-                </select>
-            </div>
+    <header class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">France Holidays Calendar</span>
         </div>
-    </nav>
+    </header>
 
-    <div class="container mt-4">
-        <div class="row mb-3">
-            <div class="col-12">
-                <div id="ad-leaderboard" class="text-center">[Leaderboard Ad Space]</div>
+    <main class="container py-3 py-md-4">
+        <section class="mb-3">
+            <h1 class="h4 mb-2">France Public and School Holidays</h1>
+            <p class="text-muted mb-3">
+                Browse French public holidays and school zones with a mobile-first calendar experience.
+            </p>
+            <div class="row g-2">
+                <div class="col-6 col-md-3">
+                    <label for="year-select" class="form-label mb-1">Year</label>
+                    <select id="year-select" class="form-select" aria-label="Year"></select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label for="zone-select" class="form-label mb-1">School zone</label>
+                    <select id="zone-select" class="form-select" aria-label="School zone">
+                        <option value="A">Zone A</option>
+                        <option value="B">Zone B</option>
+                        <option value="C">Zone C</option>
+                    </select>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="row">
-            <div class="col-lg-9 col-md-12 mb-4">
-                <div id="calendar"></div>
+        <section class="mb-3" aria-label="Top ad slot">
+            <div class="ad-slot ad-slot-header" id="ad-slot-header">
+                <ins
+                    class="adsbygoogle"
+                    style="display:block;min-height:90px"
+                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                    data-ad-slot="1111111111"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                ></ins>
             </div>
-            <div class="col-lg-3 col-md-12 text-center">
-                <div id="ad-sidebar">[Sidebar Ad Space]</div>
-            </div>
-        </div>
-    </div>
+        </section>
 
-    <footer class="py-3 border-top">
+        <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+
+        <section class="calendar-shell mb-3 d-none d-md-block" aria-label="Desktop calendar">
+            <div id="calendar"></div>
+        </section>
+
+        <section id="mobile-holiday-list" class="d-md-none" aria-label="Mobile holiday list"></section>
+
+        <section class="my-3" aria-label="Inline ad slot">
+            <div class="ad-slot ad-slot-inline" id="ad-slot-inline">
+                <ins
+                    class="adsbygoogle"
+                    style="display:block;min-height:120px"
+                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                    data-ad-slot="2222222222"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                ></ins>
+            </div>
+        </section>
+
+        <section class="my-3" aria-label="Footer ad slot">
+            <div class="ad-slot ad-slot-footer" id="ad-slot-footer">
+                <ins
+                    class="adsbygoogle"
+                    style="display:block;min-height:100px"
+                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                    data-ad-slot="3333333333"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                ></ins>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-3 border-top bg-white">
         <div class="container text-center">
             <a href="/mentions-legales" class="text-decoration-none me-3">Mentions Légales</a>
             <a href="/privacy-policy" class="text-decoration-none">Privacy Policy</a>
@@ -81,16 +197,16 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const countrySelect = document.getElementById("country-select");
         const yearSelect = document.getElementById("year-select");
-        const subdivisionSelect = document.getElementById("subdivision-select");
         const zoneSelect = document.getElementById("zone-select");
+        const mobileHolidayList = document.getElementById("mobile-holiday-list");
+        const errorMessage = document.getElementById("error-message");
         const currentYear = new Date().getFullYear();
         let calendar;
 
         function populateYearDropdown() {
             yearSelect.innerHTML = "";
-            for (let year = 2020; year <= 2030; year += 1) {
+            for (let year = 2025; year <= 2030; year += 1) {
                 const option = document.createElement("option");
                 option.value = String(year);
                 option.textContent = String(year);
@@ -101,36 +217,6 @@
             }
         }
 
-        async function loadCountries() {
-            try {
-                const response = await fetch("/api/countries");
-                if (!response.ok) {
-                    console.error("Failed to fetch countries:", response.statusText);
-                    return;
-                }
-                const countries = await response.json();
-
-                countrySelect.innerHTML = "";
-                Object.entries(countries)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .forEach(([code, name]) => {
-                        const option = document.createElement("option");
-                        option.value = code;
-                        option.textContent = `${name} (${code})`;
-                        countrySelect.appendChild(option);
-                    });
-
-                const usOption = Array.from(countrySelect.options).find(
-                    (opt) => opt.value === "US"
-                );
-                if (usOption) {
-                    countrySelect.value = "US";
-                }
-            } catch (error) {
-                console.error("Error loading countries:", error);
-            }
-        }
-
         function initializeCalendar() {
             calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
                 initialView: "dayGridMonth",
@@ -138,131 +224,192 @@
                 headerToolbar: {
                     left: "prev,next today",
                     center: "title",
-                    right: "dayGridMonth,timeGridWeek"
+                    right: "dayGridMonth"
                 },
-                buttonText: {
-                    month: "Month",
-                    week: "Week"
-                }
+                height: "auto"
             });
             calendar.render();
         }
 
-        async function loadSubdivisions() {
-            const countryCode = countrySelect.value;
-            subdivisionSelect.innerHTML = '<option value="">Select Subdivision</option>';
-            subdivisionSelect.classList.add("d-none");
-            
-            if (!countryCode) {
-                return;
+        async function fetchJson(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                const message = payload.error || `Request failed: ${response.status}`;
+                throw new Error(message);
             }
-
-            try {
-                const response = await fetch(`/api/subdivisions/${countryCode}`);
-                if (!response.ok) {
-                    console.warn("No subdivisions for this country");
-                    return;
-                }
-                const subdivisions = await response.json();
-                
-                if (Object.keys(subdivisions).length === 0) {
-                    return;
-                }
-
-                Object.entries(subdivisions).forEach(([code, name]) => {
-                    const option = document.createElement("option");
-                    option.value = code;
-                    option.textContent = name;
-                    subdivisionSelect.appendChild(option);
-                });
-
-                subdivisionSelect.classList.remove("d-none");
-            } catch (error) {
-                console.error("Error loading subdivisions:", error);
-            }
+            return response.json();
         }
 
-        function toggleSelectors() {
-            const countryCode = countrySelect.value;
-            
-            // Show zone selector only for France
-            if (countryCode === "FR") {
-                zoneSelect.classList.remove("d-none");
-                subdivisionSelect.classList.add("d-none");
-            } else {
-                zoneSelect.classList.add("d-none");
-                // Load subdivisions for other countries
-                loadSubdivisions();
+        function sortEventsByDate(events) {
+            return [...events].sort((a, b) => a.start.localeCompare(b.start));
+        }
+
+        function renderMobileHolidayList(events) {
+            mobileHolidayList.innerHTML = "";
+
+            const grouped = {};
+            for (const event of events) {
+                const [year, month] = event.start.split("-");
+                const key = `${year}-${month}`;
+                if (!grouped[key]) {
+                    grouped[key] = [];
+                }
+                grouped[key].push(event);
             }
+
+            const months = Object.keys(grouped).sort();
+            months.forEach((monthKey, index) => {
+                const monthCard = document.createElement("article");
+                monthCard.className = "month-card";
+
+                const [year, month] = monthKey.split("-");
+                const title = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric"
+                });
+
+                const heading = document.createElement("h2");
+                heading.textContent = title;
+                monthCard.appendChild(heading);
+
+                const list = document.createElement("ul");
+                list.className = "holiday-list";
+
+                grouped[monthKey].forEach((event) => {
+                    const item = document.createElement("li");
+                    item.className = "holiday-item";
+                    const dateText = new Date(event.start).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short"
+                    });
+                    item.innerHTML = `<span class="holiday-date">${dateText}</span>${event.title}`;
+                    list.appendChild(item);
+                });
+
+                monthCard.appendChild(list);
+                mobileHolidayList.appendChild(monthCard);
+
+                if ((index + 1) % 3 === 0 && index !== months.length - 1) {
+                    const inFeedAd = document.createElement("div");
+                    inFeedAd.className = "ad-slot ad-slot-inline mb-3";
+                    inFeedAd.setAttribute("aria-label", "In-feed ad slot");
+                    mobileHolidayList.appendChild(inFeedAd);
+                }
+            });
+        }
+
+        function buildEventJsonLd(events) {
+            const graph = events.map((event) => ({
+                "@type": "Event",
+                name: event.title,
+                startDate: `${event.start}T00:00:00+01:00`,
+                endDate: `${(event.end || event.start)}T23:59:59+01:00`,
+                eventStatus: "https://schema.org/EventScheduled",
+                eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+                location: {
+                    "@type": "Place",
+                    name: "France",
+                    address: {
+                        "@type": "PostalAddress",
+                        addressCountry: "FR"
+                    }
+                },
+                inLanguage: "fr"
+            }));
+
+            return {
+                "@context": "https://schema.org",
+                "@graph": graph
+            };
+        }
+
+        function updateJsonLd(events) {
+            const schema = buildEventJsonLd(events);
+            let schemaNode = document.getElementById("holiday-jsonld");
+
+            if (!schemaNode) {
+                schemaNode = document.createElement("script");
+                schemaNode.id = "holiday-jsonld";
+                schemaNode.type = "application/ld+json";
+                document.head.appendChild(schemaNode);
+            }
+
+            schemaNode.textContent = JSON.stringify(schema);
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove("d-none");
+        }
+
+        function hideError() {
+            errorMessage.textContent = "";
+            errorMessage.classList.add("d-none");
+        }
+
+        function initAds() {
+            const adSlots = document.querySelectorAll(".adsbygoogle");
+            adSlots.forEach((slot) => {
+                if (slot.dataset.adsInitialized === "1") {
+                    return;
+                }
+
+                try {
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    slot.dataset.adsInitialized = "1";
+                } catch (error) {
+                    slot.dataset.adsInitialized = "0";
+                    const container = slot.closest(".ad-slot");
+                    if (container) {
+                        container.classList.add("ad-slot-fallback");
+                    }
+                }
+            });
         }
 
         async function refreshHolidays() {
-            const countryCode = countrySelect.value;
             const year = yearSelect.value;
+            const zone = zoneSelect.value;
 
-            if (!countryCode || !year) {
-                calendar.removeAllEvents();
-                return;
-            }
+            hideError();
 
             try {
-                const allEvents = [];
+                const publicHolidays = await fetchJson(`/api/holidays/france/${year}`);
 
-                // Build URL with optional subdiv parameter
-                let holidayUrl = `/api/holidays/${countryCode}/${year}`;
-                const subdiv = subdivisionSelect.value || zoneSelect.value;
-                if (subdiv) {
-                    holidayUrl += `?subdiv=${subdiv}`;
+                let schoolHolidays = [];
+                if (Number(year) === 2025 || Number(year) === 2026) {
+                    schoolHolidays = await fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`);
                 }
 
-                const response = await fetch(holidayUrl);
-                if (!response.ok) {
-                    console.error("Failed to fetch holidays:", response.statusText);
-                    return;
-                }
-
-                const holidays = await response.json();
-                allEvents.push(...holidays);
-
-                if (countryCode === "FR" && zoneSelect.value) {
-                    const zone = zoneSelect.value;
-                    const schoolUrl = `/api/school-holidays/${countryCode}/${year}?zone=${zone}`;
-                    const schoolResponse = await fetch(schoolUrl);
-                    if (schoolResponse.ok) {
-                        const schoolHolidays = await schoolResponse.json();
-                        allEvents.push(...schoolHolidays);
-                    } else {
-                        console.warn("Failed to fetch school holidays:", schoolResponse.statusText);
-                    }
-                }
+                const allEvents = sortEventsByDate([...publicHolidays, ...schoolHolidays]);
 
                 calendar.removeAllEvents();
                 if (allEvents.length > 0) {
                     calendar.addEventSource(allEvents);
                 }
+
+                renderMobileHolidayList(allEvents);
+                updateJsonLd(allEvents);
             } catch (error) {
-                console.error("Error loading holidays:", error);
+                calendar.removeAllEvents();
+                mobileHolidayList.innerHTML = "";
+                showError(error.message || "Unable to load holiday data.");
             }
         }
 
         function initializePage() {
             populateYearDropdown();
             initializeCalendar();
-            loadCountries();
+            initAds();
             refreshHolidays();
 
-            countrySelect.addEventListener("change", () => {
-                toggleSelectors();
-                refreshHolidays();
-            });
             yearSelect.addEventListener("change", refreshHolidays);
-            subdivisionSelect.addEventListener("change", refreshHolidays);
             zoneSelect.addEventListener("change", refreshHolidays);
         }
 
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializePage);
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializePage);
         } else {
             initializePage();
         }
