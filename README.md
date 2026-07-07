@@ -150,10 +150,39 @@ Returns school holidays for France by zone.
 ```
 
 #### GET `/mentions-legales`
-Returns the legal notice page (placeholder content).
+Returns the legal notice page with production-ready metadata/content.
 
 #### GET `/privacy-policy`
-Returns the privacy policy page (placeholder content).
+Returns the privacy policy page with production-ready metadata/content.
+
+#### GET `/france`
+Redirects to the current year France landing page.
+
+#### GET `/france/<year>`
+Returns a server-rendered SEO landing page for the selected France year.
+
+#### GET `/france/<year>/public-holidays`
+Returns a server-rendered list page of France public holidays for the selected year.
+
+#### GET `/france/<year>/school-holidays/<zone>`
+Returns a server-rendered list page of school holidays for zone `A`, `B`, or `C`.
+
+#### POST `/api/metrics/revenue`
+Collects page-type and ad initialization revenue tracking events.
+
+#### GET `/api/metrics/revenue/summary`
+Returns in-memory aggregated revenue tracking counters.
+
+## ⚙️ Ad Configuration
+
+AdSense values are now environment-driven:
+
+- `ADSENSE_CLIENT_ID` (example: `ca-pub-1234567890`)
+- `ADSENSE_SLOT_HEADER`
+- `ADSENSE_SLOT_INLINE`
+- `ADSENSE_SLOT_FOOTER`
+
+If not provided, safe placeholder defaults are used.
 
 ## 🗃️ Project Structure
 
@@ -164,8 +193,11 @@ my-awesome-calendar/
 ├── README.md             # This file
 ├── templates/
 │   ├── index.html        # Main frontend (FullCalendar + Bootstrap)
-│   ├── mentions_legales.html  # Legal notice page
-│   └── privacy_policy.html    # Privacy policy page
+│   ├── mentions_legales.html       # Legal notice page
+│   ├── privacy_policy.html         # Privacy policy page
+│   ├── france_year_landing.html    # France yearly SEO landing page
+│   ├── france_public_holidays.html # France public holidays SEO page
+│   └── france_school_holidays.html # France school holidays SEO page
 └── SETUP.md             # Detailed setup instructions
 ```
 

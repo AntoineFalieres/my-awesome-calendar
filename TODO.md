@@ -11,10 +11,11 @@
 
 ## P1 - Immediately after launch
 
-- [ ] Replace AdSense placeholder IDs with real publisher/slot IDs.
-- [ ] Add route/template-level revenue tracking (CTR/RPM by page type).
-- [ ] Expand France SEO landing pages (`/france/{year}/...`) with internal links.
-- [ ] Improve legal/privacy template metadata to match SEO checks.
+- [x] Replace hardcoded AdSense placeholders with environment-driven publisher/slot IDs.
+- [x] Add route/template-level revenue tracking (CTR/RPM by page type).
+- [x] Expand France SEO landing pages (`/france/{year}/...`) with internal links.
+- [x] Improve legal/privacy template metadata to match SEO checks.
+- [ ] Set production AdSense values in deployment environment variables.
 
 ## P2 - Deferred until traffic baseline
 
