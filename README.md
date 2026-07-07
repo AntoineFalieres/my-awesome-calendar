@@ -184,6 +184,22 @@ AdSense values are now environment-driven:
 
 If not provided, safe placeholder defaults are used.
 
+## 🤖 Planning Docs Automation
+
+Merged pull requests can automatically update managed sections in:
+
+- `ROADMAP.md`
+- `TODO.md`
+- `CHANGELOG.md`
+
+Automation uses deterministic role ownership tags (`PM`, `SEO`, `UX/UI`,
+`Full-Stack`, `Ad Ops`) from merged PR metadata and opens a dedicated follow-up
+PR with only generated doc updates.
+
+Manual trigger is available via GitHub Actions workflow:
+
+- `Roadmap/TODO/Changelog Auto Update`
+
 ## 🗃️ Project Structure
 
 ```

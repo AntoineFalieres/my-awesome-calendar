@@ -1,0 +1,86 @@
+name: Roadmap/TODO/Changelog Auto Update
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Merged PR number to process"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-docs-from-merged-pr:
+    if: >
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       !startsWith(github.event.pull_request.head.ref, 'auto/roadmap-todo-changelog-')) ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve PR number
+        id: pr
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build merged PR payload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/${REPO}/pulls/${PR_NUMBER}" > /tmp/pr.json
+          gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" > /tmp/pr_files.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          pr = json.loads(Path("/tmp/pr.json").read_text())
+          files = json.loads(Path("/tmp/pr_files.json").read_text())
+          pr["files"] = [{"filename": item["filename"]} for item in files]
+          Path("/tmp/merged_pr.json").write_text(json.dumps(pr))
+          PY
+
+      - name: Update roadmap/todo/changelog
+        run: |
+          python3 \
+            .github/agentic/skills/project/roadmap-todo-changelog-auto-updater/scripts/update_docs_from_pr.py \
+            --pr-json /tmp/merged_pr.json
+
+      - name: Create follow-up PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: auto/roadmap-todo-changelog-pr-${{ steps.pr.outputs.number }}
+          delete-branch: true
+          commit-message: "chore(docs): auto-update roadmap/todo/changelog from PR #${{ steps.pr.outputs.number }}"
+          title: "chore(docs): auto-update roadmap/todo/changelog from PR #${{ steps.pr.outputs.number }}"
+          body: |
+            Automated follow-up generated from merged PR #${{ steps.pr.outputs.number }}.
+
+            This PR updates only auto-managed sections in:
+            - ROADMAP.md
+            - TODO.md
+            - CHANGELOG.md
+          add-paths: |
+            ROADMAP.md
+            TODO.md
+            CHANGELOG.md
