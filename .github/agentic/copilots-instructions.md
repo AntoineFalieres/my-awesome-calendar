@@ -178,6 +178,17 @@ Local skills live under `.github/agentic/skills/**`.
 - If the skill or its scripts are unavailable, stop and ask the user how to
   proceed; do not silently bypass the process.
 
+### Roadmap/TODO/Changelog auto-updater
+- Use the local skill at
+  `.github/agentic/skills/project/roadmap-todo-changelog-auto-updater/SKILL.md`
+  when the request is to update planning docs from merged pull requests.
+- **Mandatory trigger**: when a request asks for automatic post-merge updates to
+  `ROADMAP.md`, `TODO.md`, and/or `CHANGELOG.md`.
+- Keep updates deterministic and role-tagged (PM, SEO, UX/UI, Full-Stack, Ad
+  Ops) from PR metadata.
+- Restrict writes to explicit auto-managed marker sections; do not rewrite
+  manual planning content.
+
 ## Quality checks before final answer
 
 - Confirm changed routes/templates still map correctly to user-visible pages.

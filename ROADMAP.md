@@ -21,10 +21,13 @@
 - Metadata and heading conventions
 - JSON-LD Event structure
 - Mobile-first layout with ad-safe placeholders
+- Legal footer links and dedicated legal/privacy pages
+- GDPR consent script placeholder wired in `<head>` for future consent manager integration
 
 **Done when:**
 - Pages are crawlable and semantically structured
 - JSON-LD is present and consistent with rendered holiday data
+- Legal and privacy pages are reachable from core pages and aligned with SEO/legal baseline
 
 ## Step 3 - Full-stack delivery
 
@@ -52,9 +55,33 @@
 - Ad loading failures do not break UI or shift layout
 - `ads.txt` is reachable and validly formatted
 
+## Step 5 - Compliance and consent hardening
+
+**Goal:** make monetization legally compliant while preserving UX and performance.
+
+- PM: define consent scope (analytics, ads personalization, required cookies) and acceptance criteria
+- SEO: enforce metadata/canonical/indexing policy for legal pages
+- UX/UI: design mobile-first cookie consent UX with readable copy and low friction
+- Full-Stack: integrate consent manager script and consent state handling
+- Ad Ops: enforce Consent Mode and block ad initialization before valid consent signal
+
+**Done when:**
+- Consent state is captured before ad/measurement activation
+- Legal/privacy pages, footer links, and consent UX are consistent and production-ready
+- Revenue tracking remains available in compliant mode
+
 ## Next
 
-- Validate real AdSense IDs
-- Iterate ad placement by RPM/CTR data
-- Expand SEO landing pages before country expansion
+- PM: approve consent model and production rollout criteria
+- Full-Stack + Ad Ops: set production AdSense IDs and consent-gated ad initialization
+- SEO + UX/UI: refine legal/privacy page structure, metadata, and footer discoverability
+- Ad Ops: iterate ad placement by RPM/CTR data
+- PM + SEO: expand SEO landing pages before country expansion
 
+## Auto-managed updates
+
+<!-- AUTO-ROADMAP-UPDATES:START -->
+### Next from merged PRs
+
+- 2026-06-25 - PR #4 `feat(ui): add legal footer links and GDPR script placeholder` - Roles: SEO, UX/UI, Full-Stack, Ad Ops (https://github.com/AntoineFalieres/my-awesome-calendar/pull/4) <!-- AUTO-PR:4 -->
+<!-- AUTO-ROADMAP-UPDATES:END -->
