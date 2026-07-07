@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentions légales | Calendrier des vacances en France</title>
+    <title>Vacances en France {{ year }} | Jours fériés et zones scolaires</title>
     <meta
         name="description"
-        content="Informations légales du site Calendrier France : éditeur, hébergement, responsabilité et contact."
+        content="Préparez {{ year }} avec les jours fériés en France et les vacances scolaires par zone A, B et C."
     >
     <link rel="canonical" href="{{ canonical_url }}">
     <script
@@ -24,41 +24,31 @@
         <nav aria-label="Fil d'Ariane" class="mb-3">
             <a href="/" class="text-decoration-none">Accueil</a>
             <span class="mx-1">/</span>
-            <span aria-current="page">Mentions légales</span>
+            <span aria-current="page">France {{ year }}</span>
         </nav>
 
-        <h1 class="mb-3">Mentions légales</h1>
+        <h1 class="mb-3">Calendrier des vacances en France {{ year }}</h1>
         <p class="text-muted mb-4">
-            Cette page présente les informations légales et les conditions générales d'utilisation du site.
+            Accédez aux pages dédiées pour les jours fériés et vacances scolaires en France.
         </p>
 
         <section class="mb-4">
-            <h2 class="h5">Éditeur du site</h2>
-            <p class="mb-0">
-                Le site est édité à titre informatif pour la consultation des jours fériés et vacances scolaires en France.
-            </p>
+            <h2 class="h5">Pages principales</h2>
+            <ul class="mb-0">
+                <li><a href="/france/{{ year }}/public-holidays">Jours fériés France {{ year }}</a></li>
+                <li><a href="/france/{{ year }}/school-holidays/A">Vacances scolaires zone A {{ year }}</a></li>
+                <li><a href="/france/{{ year }}/school-holidays/B">Vacances scolaires zone B {{ year }}</a></li>
+                <li><a href="/france/{{ year }}/school-holidays/C">Vacances scolaires zone C {{ year }}</a></li>
+            </ul>
         </section>
 
         <section class="mb-4">
-            <h2 class="h5">Hébergement</h2>
-            <p class="mb-0">
-                Le site est hébergé sur une infrastructure cloud conforme aux standards de sécurité et de disponibilité.
-            </p>
-        </section>
-
-        <section class="mb-4">
-            <h2 class="h5">Responsabilité</h2>
-            <p class="mb-0">
-                Les informations publiées sont fournies à titre indicatif. Malgré le soin apporté aux mises à jour,
-                l'utilisateur est invité à vérifier les données officielles en cas d'usage administratif.
-            </p>
-        </section>
-
-        <section class="mb-4">
-            <h2 class="h5">Contact</h2>
-            <p class="mb-0">
-                Pour toute question relative au site, utilisez les canaux de contact habituels du projet.
-            </p>
+            <h2 class="h5">Autres années disponibles</h2>
+            <ul class="mb-0">
+                {% for linked_year in year_links %}
+                <li><a href="/france/{{ linked_year }}">France {{ linked_year }}</a></li>
+                {% endfor %}
+            </ul>
         </section>
 
         <section class="my-4" aria-label="Emplacement publicitaire">
@@ -67,15 +57,15 @@
                 style="min-height:120px"
                 data-ad-client="{{ ad_config.client_id }}"
                 data-ad-slot="{{ ad_config.slot_inline }}"
-                data-slot-name="legal-inline"
+                data-slot-name="france-landing-inline"
                 data-ad-format="auto"
                 data-full-width-responsive="true"
             ></ins>
         </section>
 
         <div class="d-flex gap-3">
+            <a href="/mentions-legales" class="text-decoration-none">Mentions légales</a>
             <a href="/privacy-policy" class="text-decoration-none">Politique de confidentialité</a>
-            <a href="/france" class="text-decoration-none">Pages France</a>
         </div>
     </main>
     <script>
@@ -108,7 +98,6 @@
                 if (slot.dataset.adsInitialized === "1") {
                     return;
                 }
-
                 try {
                     (window.adsbygoogle = window.adsbygoogle || []).push({});
                     slot.dataset.adsInitialized = "1";

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify, request, send_from_directory
+from flask import Flask, render_template, jsonify, request, send_from_directory, redirect, url_for, abort
 import json
+import os
 import re
 from datetime import date
 from urllib.error import HTTPError, URLError
@@ -11,6 +12,12 @@ from holidays.registry import COUNTRIES as HOLIDAY_COUNTRIES
 app = Flask(__name__)
 NAGER_PUBLIC_HOLIDAYS_API = "https://date.nager.at/api/v3/PublicHolidays/{year}/FR"
 FR_PUBLIC_HOLIDAYS_CACHE = {}
+REVENUE_EVENT_COUNTS = {}
+FRANCE_SEO_YEARS = tuple(range(2025, 2031))
+ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-XXXXXXXXXXXXXXXX")
+ADSENSE_SLOT_HEADER = os.getenv("ADSENSE_SLOT_HEADER", "1111111111")
+ADSENSE_SLOT_INLINE = os.getenv("ADSENSE_SLOT_INLINE", "2222222222")
+ADSENSE_SLOT_FOOTER = os.getenv("ADSENSE_SLOT_FOOTER", "3333333333")
 
 # Mapping of country codes to human-readable country names
 
@@ -148,22 +155,162 @@ def fetch_fr_public_holidays(year):
     return events
 
 
+def get_ad_config():
+    """Return ad configuration for template rendering."""
+    return {
+        "client_id": ADSENSE_CLIENT_ID,
+        "slot_header": ADSENSE_SLOT_HEADER,
+        "slot_inline": ADSENSE_SLOT_INLINE,
+        "slot_footer": ADSENSE_SLOT_FOOTER,
+    }
+
+
+def get_france_school_holidays_for_zone(year, zone):
+    """Return normalized France school-holiday events for a specific zone and year."""
+    year_str = str(year)
+    if year_str not in FR_SCHOOL_HOLIDAYS_ZONES.get(zone, {}):
+        raise ValueError(f"School holidays data not available for {year}")
+
+    events = []
+    for start_str, end_str in FR_SCHOOL_HOLIDAYS_ZONES[zone][year_str]:
+        events.append(
+            {
+                "title": f"School holidays (Zone {zone})",
+                "start": start_str,
+                "end": end_str,
+                "backgroundColor": "#ff6b6b",
+            }
+        )
+    return events
+
+
+def get_supported_france_year(year):
+    """Validate and normalize the year used by France SEO routes."""
+    if year not in FRANCE_SEO_YEARS:
+        abort(404)
+    return year
+
+
+def record_revenue_event(payload):
+    """Track route/template-level revenue events by page type."""
+    event_type = payload.get("eventType")
+    page_type = payload.get("pageType")
+    slot_name = payload.get("slot", "none")
+    status = payload.get("status", "none")
+
+    if not isinstance(event_type, str) or not event_type.strip():
+        raise ValueError("eventType must be a non-empty string")
+    if not isinstance(page_type, str) or not page_type.strip():
+        raise ValueError("pageType must be a non-empty string")
+
+    key = (page_type.strip(), event_type.strip(), str(slot_name), str(status))
+    REVENUE_EVENT_COUNTS[key] = REVENUE_EVENT_COUNTS.get(key, 0) + 1
+
+
 @app.route('/')
 def index():
     """Serve the main index.html template."""
-    return render_template('index.html')
+    current_year = min(max(date.today().year, FRANCE_SEO_YEARS[0]), FRANCE_SEO_YEARS[-1])
+    return render_template(
+        'index.html',
+        ad_config=get_ad_config(),
+        page_type="calendar-home",
+        canonical_url=request.base_url,
+        current_year=current_year,
+    )
 
 
 @app.route('/mentions-legales')
 def mentions_legales():
     """Serve the Mentions Légales page."""
-    return render_template('mentions_legales.html')
+    return render_template(
+        'mentions_legales.html',
+        ad_config=get_ad_config(),
+        page_type="legal-notice",
+        canonical_url=request.base_url,
+    )
 
 
 @app.route('/privacy-policy')
 def privacy_policy():
     """Serve the Privacy Policy page."""
-    return render_template('privacy_policy.html')
+    return render_template(
+        'privacy_policy.html',
+        ad_config=get_ad_config(),
+        page_type="privacy-policy",
+        canonical_url=request.base_url,
+    )
+
+
+@app.route('/france')
+def france_root():
+    """Redirect to the current year France landing page."""
+    current_year = min(max(date.today().year, FRANCE_SEO_YEARS[0]), FRANCE_SEO_YEARS[-1])
+    return redirect(url_for('france_year_landing', year=current_year))
+
+
+@app.route('/france/<int:year>')
+def france_year_landing(year):
+    """Render a crawlable France year landing page."""
+    year = get_supported_france_year(year)
+    year_links = [year_value for year_value in FRANCE_SEO_YEARS if year_value != year]
+    return render_template(
+        'france_year_landing.html',
+        year=year,
+        year_links=year_links,
+        canonical_url=request.base_url,
+        page_type="france-year-landing",
+        ad_config=get_ad_config(),
+    )
+
+
+@app.route('/france/<int:year>/public-holidays')
+def france_public_holidays_page(year):
+    """Render a server-side France public holidays page."""
+    year = get_supported_france_year(year)
+    error_message = None
+    public_holidays = []
+    try:
+        public_holidays = fetch_fr_public_holidays(year)
+    except RuntimeError as error:
+        error_message = str(error)
+
+    return render_template(
+        'france_public_holidays.html',
+        year=year,
+        public_holidays=public_holidays,
+        error_message=error_message,
+        canonical_url=request.base_url,
+        page_type="france-public-holidays",
+        ad_config=get_ad_config(),
+    )
+
+
+@app.route('/france/<int:year>/school-holidays/<zone>')
+def france_school_holidays_page(year, zone):
+    """Render a server-side France school holidays page for one zone."""
+    year = get_supported_france_year(year)
+    zone = zone.upper()
+    if zone not in {'A', 'B', 'C'}:
+        abort(404)
+
+    error_message = None
+    school_holidays = []
+    try:
+        school_holidays = get_france_school_holidays_for_zone(year, zone)
+    except ValueError as error:
+        error_message = str(error)
+
+    return render_template(
+        'france_school_holidays.html',
+        year=year,
+        zone=zone,
+        school_holidays=school_holidays,
+        error_message=error_message,
+        canonical_url=request.base_url,
+        page_type="france-school-holidays",
+        ad_config=get_ad_config(),
+    )
 
 
 @app.route('/ads.txt')
@@ -250,20 +397,42 @@ def get_school_holidays(country_code, year):
     if zone not in ['A', 'B', 'C']:
         return jsonify({'error': 'Zone must be A, B, or C'}), 400
     
-    year_str = str(year)
-    if year_str not in FR_SCHOOL_HOLIDAYS_ZONES.get(zone, {}):
-        return jsonify({'error': f'School holidays data not available for {year}'}), 400
-    
-    events = []
-    for start_str, end_str in FR_SCHOOL_HOLIDAYS_ZONES[zone][year_str]:
-        events.append({
-            'title': f'School holidays (Zone {zone})',
-            'start': start_str,
-            'end': end_str,
-            'backgroundColor': '#ff6b6b'
-        })
-    
-    return jsonify(events)
+    try:
+        return jsonify(get_france_school_holidays_for_zone(year, zone))
+    except ValueError as error:
+        return jsonify({'error': str(error)}), 400
+
+
+@app.route('/api/metrics/revenue', methods=['POST'])
+def track_revenue_event():
+    """Collect route/template-level revenue tracking events."""
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({'error': 'Invalid JSON payload'}), 400
+
+    try:
+        record_revenue_event(payload)
+    except ValueError as error:
+        return jsonify({'error': str(error)}), 400
+
+    return jsonify({'status': 'accepted'}), 202
+
+
+@app.route('/api/metrics/revenue/summary')
+def revenue_summary():
+    """Expose in-memory revenue event counters for diagnostics."""
+    summary = []
+    for (page_type, event_type, slot_name, status), count in sorted(REVENUE_EVENT_COUNTS.items()):
+        summary.append(
+            {
+                'pageType': page_type,
+                'eventType': event_type,
+                'slot': slot_name,
+                'status': status,
+                'count': count,
+            }
+        )
+    return jsonify(summary)
 
 
 if __name__ == '__main__':

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentions légales | Calendrier des vacances en France</title>
+    <title>Vacances scolaires zone {{ zone }} en France {{ year }}</title>
     <meta
         name="description"
-        content="Informations légales du site Calendrier France : éditeur, hébergement, responsabilité et contact."
+        content="Consultez les périodes de vacances scolaires de la zone {{ zone }} en France pour {{ year }}."
     >
     <link rel="canonical" href="{{ canonical_url }}">
     <script
@@ -24,42 +24,34 @@
         <nav aria-label="Fil d'Ariane" class="mb-3">
             <a href="/" class="text-decoration-none">Accueil</a>
             <span class="mx-1">/</span>
-            <span aria-current="page">Mentions légales</span>
+            <a href="/france/{{ year }}" class="text-decoration-none">France {{ year }}</a>
+            <span class="mx-1">/</span>
+            <span aria-current="page">Zone {{ zone }}</span>
         </nav>
 
-        <h1 class="mb-3">Mentions légales</h1>
+        <h1 class="mb-3">Vacances scolaires zone {{ zone }} — {{ year }}</h1>
         <p class="text-muted mb-4">
-            Cette page présente les informations légales et les conditions générales d'utilisation du site.
+            Dates des vacances scolaires officielles pour la zone {{ zone }}.
         </p>
 
+        {% if error_message %}
+        <div class="alert alert-warning" role="alert">
+            {{ error_message }}
+        </div>
+        {% elif school_holidays %}
         <section class="mb-4">
-            <h2 class="h5">Éditeur du site</h2>
-            <p class="mb-0">
-                Le site est édité à titre informatif pour la consultation des jours fériés et vacances scolaires en France.
-            </p>
+            <h2 class="h5">Périodes de vacances</h2>
+            <ul class="mb-0">
+                {% for holiday in school_holidays %}
+                <li>{{ holiday.start }} au {{ holiday.end }}</li>
+                {% endfor %}
+            </ul>
         </section>
-
-        <section class="mb-4">
-            <h2 class="h5">Hébergement</h2>
-            <p class="mb-0">
-                Le site est hébergé sur une infrastructure cloud conforme aux standards de sécurité et de disponibilité.
-            </p>
-        </section>
-
-        <section class="mb-4">
-            <h2 class="h5">Responsabilité</h2>
-            <p class="mb-0">
-                Les informations publiées sont fournies à titre indicatif. Malgré le soin apporté aux mises à jour,
-                l'utilisateur est invité à vérifier les données officielles en cas d'usage administratif.
-            </p>
-        </section>
-
-        <section class="mb-4">
-            <h2 class="h5">Contact</h2>
-            <p class="mb-0">
-                Pour toute question relative au site, utilisez les canaux de contact habituels du projet.
-            </p>
-        </section>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            Aucune donnée disponible pour cette année.
+        </div>
+        {% endif %}
 
         <section class="my-4" aria-label="Emplacement publicitaire">
             <ins
@@ -67,15 +59,17 @@
                 style="min-height:120px"
                 data-ad-client="{{ ad_config.client_id }}"
                 data-ad-slot="{{ ad_config.slot_inline }}"
-                data-slot-name="legal-inline"
+                data-slot-name="france-school-inline"
                 data-ad-format="auto"
                 data-full-width-responsive="true"
             ></ins>
         </section>
 
-        <div class="d-flex gap-3">
-            <a href="/privacy-policy" class="text-decoration-none">Politique de confidentialité</a>
-            <a href="/france" class="text-decoration-none">Pages France</a>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="/france/{{ year }}/public-holidays" class="text-decoration-none">Jours fériés</a>
+            <a href="/france/{{ year }}/school-holidays/A" class="text-decoration-none">Zone A</a>
+            <a href="/france/{{ year }}/school-holidays/B" class="text-decoration-none">Zone B</a>
+            <a href="/france/{{ year }}/school-holidays/C" class="text-decoration-none">Zone C</a>
         </div>
     </main>
     <script>
@@ -108,7 +102,6 @@
                 if (slot.dataset.adsInitialized === "1") {
                     return;
                 }
-
                 try {
                     (window.adsbygoogle = window.adsbygoogle || []).push({});
                     slot.dataset.adsInitialized = "1";

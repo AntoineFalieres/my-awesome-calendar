@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>France Holidays Calendar</title>
+    <title>Calendrier des vacances en France | Jours fériés et zones scolaires</title>
     <meta
         name="description"
-        content="Explore France public holidays and school holidays by year and zone in a fast, mobile-first calendar."
+        content="Consultez les jours fériés et vacances scolaires en France par année et zone, avec un calendrier rapide et mobile-first."
     >
+    <link rel="canonical" href="{{ canonical_url }}">
     <script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_config.client_id }}"
         crossorigin="anonymous"
     ></script>
     <link
@@ -113,24 +114,29 @@
 <body>
     <header class="navbar navbar-dark bg-dark">
         <div class="container">
-            <span class="navbar-brand mb-0 h1">France Holidays Calendar</span>
+            <span class="navbar-brand mb-0 h1">Calendrier France</span>
         </div>
     </header>
 
     <main class="container py-3 py-md-4">
         <section class="mb-3">
-            <h1 class="h4 mb-2">France Public and School Holidays</h1>
+            <h1 class="h4 mb-2">Jours fériés et vacances scolaires en France</h1>
             <p class="text-muted mb-3">
-                Browse French public holidays and school zones with a mobile-first calendar experience.
+                Consultez les dates officielles par année et zone scolaire dans une interface optimisée mobile.
+            </p>
+            <p class="mb-3">
+                <a href="/france/{{ current_year }}" class="link-primary text-decoration-none">
+                    Explorer les pages France {{ current_year }}
+                </a>
             </p>
             <div class="row g-2">
                 <div class="col-6 col-md-3">
-                    <label for="year-select" class="form-label mb-1">Year</label>
-                    <select id="year-select" class="form-select" aria-label="Year"></select>
+                    <label for="year-select" class="form-label mb-1">Année</label>
+                    <select id="year-select" class="form-select" aria-label="Année"></select>
                 </div>
                 <div class="col-6 col-md-3">
-                    <label for="zone-select" class="form-label mb-1">School zone</label>
-                    <select id="zone-select" class="form-select" aria-label="School zone">
+                    <label for="zone-select" class="form-label mb-1">Zone scolaire</label>
+                    <select id="zone-select" class="form-select" aria-label="Zone scolaire">
                         <option value="A">Zone A</option>
                         <option value="B">Zone B</option>
                         <option value="C">Zone C</option>
@@ -144,8 +150,9 @@
                 <ins
                     class="adsbygoogle"
                     style="display:block;min-height:90px"
-                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                    data-ad-slot="1111111111"
+                    data-ad-client="{{ ad_config.client_id }}"
+                    data-ad-slot="{{ ad_config.slot_header }}"
+                    data-slot-name="header"
                     data-ad-format="auto"
                     data-full-width-responsive="true"
                 ></ins>
@@ -165,8 +172,9 @@
                 <ins
                     class="adsbygoogle"
                     style="display:block;min-height:120px"
-                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                    data-ad-slot="2222222222"
+                    data-ad-client="{{ ad_config.client_id }}"
+                    data-ad-slot="{{ ad_config.slot_inline }}"
+                    data-slot-name="inline"
                     data-ad-format="auto"
                     data-full-width-responsive="true"
                 ></ins>
@@ -178,8 +186,9 @@
                 <ins
                     class="adsbygoogle"
                     style="display:block;min-height:100px"
-                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                    data-ad-slot="3333333333"
+                    data-ad-client="{{ ad_config.client_id }}"
+                    data-ad-slot="{{ ad_config.slot_footer }}"
+                    data-slot-name="footer"
                     data-ad-format="auto"
                     data-full-width-responsive="true"
                 ></ins>
@@ -197,6 +206,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const PAGE_TYPE = {{ page_type|tojson }};
         const yearSelect = document.getElementById("year-select");
         const zoneSelect = document.getElementById("zone-select");
         const mobileHolidayList = document.getElementById("mobile-holiday-list");
@@ -348,6 +358,29 @@
             errorMessage.classList.add("d-none");
         }
 
+        function trackRevenueEvent(eventPayload) {
+            const payload = {
+                pageType: PAGE_TYPE,
+                ...eventPayload
+            };
+
+            const body = JSON.stringify(payload);
+            if (navigator.sendBeacon) {
+                const blob = new Blob([body], { type: "application/json" });
+                navigator.sendBeacon("/api/metrics/revenue", blob);
+                return;
+            }
+
+            fetch("/api/metrics/revenue", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body,
+                keepalive: true
+            }).catch((error) => {
+                console.warn("Revenue tracking failed", error);
+            });
+        }
+
         function initAds() {
             const adSlots = document.querySelectorAll(".adsbygoogle");
             adSlots.forEach((slot) => {
@@ -358,12 +391,22 @@
                 try {
                     (window.adsbygoogle = window.adsbygoogle || []).push({});
                     slot.dataset.adsInitialized = "1";
+                    trackRevenueEvent({
+                        eventType: "ad_init",
+                        slot: slot.dataset.slotName || "unknown",
+                        status: "success"
+                    });
                 } catch (error) {
                     slot.dataset.adsInitialized = "0";
                     const container = slot.closest(".ad-slot");
                     if (container) {
                         container.classList.add("ad-slot-fallback");
                     }
+                    trackRevenueEvent({
+                        eventType: "ad_init",
+                        slot: slot.dataset.slotName || "unknown",
+                        status: "failed"
+                    });
                 }
             });
         }
@@ -399,6 +442,7 @@
         }
 
         function initializePage() {
+            trackRevenueEvent({ eventType: "page_view", status: "viewed" });
             populateYearDropdown();
             initializeCalendar();
             initAds();

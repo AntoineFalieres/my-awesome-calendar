@@ -1,19 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy</title>
+    <title>Politique de confidentialité | Calendrier des vacances en France</title>
+    <meta
+        name="description"
+        content="Consultez la politique de confidentialité du site Calendrier France : données collectées, finalités, durée de conservation et droits des utilisateurs."
+    >
+    <link rel="canonical" href="{{ canonical_url }}">
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_config.client_id }}"
+        crossorigin="anonymous"
+    ></script>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 </head>
 <body>
-    <main class="container py-5">
-        <h1 class="mb-4">Privacy Policy</h1>
-        <p>Privacy policy content to be completed.</p>
-        <a href="/" class="btn btn-link px-0">Back to calendar</a>
+    <main class="container py-4 py-md-5">
+        <nav aria-label="Fil d'Ariane" class="mb-3">
+            <a href="/" class="text-decoration-none">Accueil</a>
+            <span class="mx-1">/</span>
+            <span aria-current="page">Politique de confidentialité</span>
+        </nav>
+
+        <h1 class="mb-3">Politique de confidentialité</h1>
+        <p class="text-muted mb-4">
+            Cette politique décrit comment les informations techniques et de mesure d'audience sont traitées sur ce site.
+        </p>
+
+        <section class="mb-4">
+            <h2 class="h5">Données collectées</h2>
+            <p class="mb-0">
+                Le site peut collecter des données techniques minimales (journalisation serveur, métriques de chargement, événements publicitaires)
+                nécessaires à la fiabilité du service et à l'analyse des performances.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h2 class="h5">Finalités de traitement</h2>
+            <p class="mb-0">
+                Les données sont utilisées pour améliorer l'expérience utilisateur, suivre les performances des pages et maintenir la qualité du service.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h2 class="h5">Cookies et publicités</h2>
+            <p class="mb-0">
+                Des partenaires publicitaires peuvent utiliser des cookies ou technologies équivalentes pour mesurer l'efficacité des annonces,
+                conformément à leurs propres politiques de confidentialité.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h2 class="h5">Droits des utilisateurs</h2>
+            <p class="mb-0">
+                Vous pouvez demander des informations sur le traitement de vos données et exercer vos droits d'accès, de rectification ou de suppression.
+            </p>
+        </section>
+
+        <section class="my-4" aria-label="Emplacement publicitaire">
+            <ins
+                class="adsbygoogle d-block"
+                style="min-height:120px"
+                data-ad-client="{{ ad_config.client_id }}"
+                data-ad-slot="{{ ad_config.slot_inline }}"
+                data-slot-name="privacy-inline"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+            ></ins>
+        </section>
+
+        <div class="d-flex gap-3">
+            <a href="/mentions-legales" class="text-decoration-none">Mentions légales</a>
+            <a href="/france" class="text-decoration-none">Pages France</a>
+        </div>
     </main>
+    <script>
+        const PAGE_TYPE = {{ page_type|tojson }};
+
+        function trackRevenueEvent(eventPayload) {
+            const payload = {
+                pageType: PAGE_TYPE,
+                ...eventPayload
+            };
+            const body = JSON.stringify(payload);
+            if (navigator.sendBeacon) {
+                const blob = new Blob([body], { type: "application/json" });
+                navigator.sendBeacon("/api/metrics/revenue", blob);
+                return;
+            }
+            fetch("/api/metrics/revenue", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body,
+                keepalive: true
+            }).catch((error) => {
+                console.warn("Revenue tracking failed", error);
+            });
+        }
+
+        function initAds() {
+            const adSlots = document.querySelectorAll(".adsbygoogle");
+            adSlots.forEach((slot) => {
+                if (slot.dataset.adsInitialized === "1") {
+                    return;
+                }
+
+                try {
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    slot.dataset.adsInitialized = "1";
+                    trackRevenueEvent({
+                        eventType: "ad_init",
+                        slot: slot.dataset.slotName || "unknown",
+                        status: "success"
+                    });
+                } catch (error) {
+                    trackRevenueEvent({
+                        eventType: "ad_init",
+                        slot: slot.dataset.slotName || "unknown",
+                        status: "failed"
+                    });
+                }
+            });
+        }
+
+        trackRevenueEvent({ eventType: "page_view", status: "viewed" });
+        initAds();
+    </script>
 </body>
 </html>
