@@ -1,11 +1,16 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
+import json
 import re
 from datetime import date
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 import holidays
 from holidays.registry import COUNTRIES as HOLIDAY_COUNTRIES
 
 app = Flask(__name__)
+NAGER_PUBLIC_HOLIDAYS_API = "https://date.nager.at/api/v3/PublicHolidays/{year}/FR"
+FR_PUBLIC_HOLIDAYS_CACHE = {}
 
 # Mapping of country codes to human-readable country names
 
@@ -103,6 +108,46 @@ def get_country_subdivisions(country_code):
         return {}
 
 
+def fetch_fr_public_holidays(year):
+    """Fetch and normalize France public holidays from Nager.Date."""
+    if year < 1900 or year > 2200:
+        raise ValueError("Year must be between 1900 and 2200")
+
+    cache_key = str(year)
+    if cache_key in FR_PUBLIC_HOLIDAYS_CACHE:
+        return FR_PUBLIC_HOLIDAYS_CACHE[cache_key]
+
+    endpoint = NAGER_PUBLIC_HOLIDAYS_API.format(year=year)
+    try:
+        with urlopen(endpoint, timeout=10) as response:
+            payload = response.read().decode("utf-8")
+            upstream_holidays = json.loads(payload)
+    except HTTPError as error:
+        raise RuntimeError(f"Nager.Date returned HTTP {error.code}") from error
+    except URLError as error:
+        raise RuntimeError("Failed to reach Nager.Date API") from error
+    except json.JSONDecodeError as error:
+        raise RuntimeError("Nager.Date returned invalid JSON payload") from error
+
+    events = []
+    for holiday in upstream_holidays:
+        holiday_date = holiday.get("date")
+        holiday_name = holiday.get("localName") or holiday.get("name")
+        if not holiday_date or not holiday_name:
+            continue
+
+        events.append(
+            {
+                "title": holiday_name,
+                "start": holiday_date,
+                "holidayType": "public",
+            }
+        )
+
+    FR_PUBLIC_HOLIDAYS_CACHE[cache_key] = events
+    return events
+
+
 @app.route('/')
 def index():
     """Serve the main index.html template."""
@@ -119,6 +164,12 @@ def mentions_legales():
 def privacy_policy():
     """Serve the Privacy Policy page."""
     return render_template('privacy_policy.html')
+
+
+@app.route('/ads.txt')
+def ads_txt():
+    """Serve ads.txt from the repository root."""
+    return send_from_directory(app.root_path, 'ads.txt', mimetype='text/plain')
 
 
 @app.route('/api/countries')
@@ -175,6 +226,17 @@ def get_holidays(country_code, year):
         return jsonify(events)
     except Exception as e:
         return jsonify({'error': f'Failed to retrieve holidays: {str(e)}'}), 400
+
+
+@app.route('/api/holidays/france/<int:year>')
+def get_france_holidays(year):
+    """Return France public holidays from Nager.Date in FullCalendar format."""
+    try:
+        return jsonify(fetch_fr_public_holidays(year))
+    except ValueError as error:
+        return jsonify({'error': str(error)}), 400
+    except RuntimeError as error:
+        return jsonify({'error': str(error)}), 502
 
 
 @app.route('/api/school-holidays/<country_code>/<int:year>')
