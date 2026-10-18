@@ -63,7 +63,7 @@ jobs:
       - name: Update roadmap/todo/changelog
         run: |
           python3 \
-            .github/agentic/skills/project/roadmap-todo-changelog-auto-updater/scripts/update_docs_from_pr.py \
+            .github/skills/project/roadmap-todo-changelog-auto-updater/scripts/update_docs_from_pr.py \
             --pr-json /tmp/merged_pr.json
 
       - name: Create follow-up PR
