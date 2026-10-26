@@ -28,11 +28,11 @@
 
 ## P1.5 - Compliance hardening (role-owned)
 
-- [ ] **PM:** lock final consent policy (required vs optional cookies, consent granularity, auditability).
+- [x] **PM:** document the consent policy in [CONSENT_POLICY.md](CONSENT_POLICY.md) (required vs optional processing, consent granularity, and auditability).
 - [ ] **SEO:** define index/canonical/meta policy for legal pages and verify internal linking weight.
 - [ ] **UX/UI:** design and copy a mobile-first cookie consent banner/modal with clear accept/reject actions.
 - [ ] **Full-Stack:** integrate real consent manager script and persist consent state for templates/scripts.
-- [ ] **Ad Ops:** enforce consent-gated ad loading + Consent Mode signal wiring before ad initialization.
+- [ ] **Ad Ops:** configure Consent Mode before ad initialization; block personalized ads without opt-in while allowing contextual ads as defined in [CONSENT_POLICY.md](CONSENT_POLICY.md).
 - [ ] **Full-Stack + Ad Ops:** ensure revenue tracking works in consented and non-consented states.
 
 ## Agent handoff workflow
