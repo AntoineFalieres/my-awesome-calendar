@@ -59,11 +59,11 @@
 
 **Goal:** make monetization legally compliant while preserving UX and performance.
 
-- PM: define consent scope (analytics, ads personalization, required cookies) and acceptance criteria
+- PM: document consent scope and acceptance criteria in [CONSENT_POLICY.md](CONSENT_POLICY.md)
 - SEO: enforce metadata/canonical/indexing policy for legal pages
 - UX/UI: design mobile-first cookie consent UX with readable copy and low friction
 - Full-Stack: integrate consent manager script and consent state handling
-- Ad Ops: enforce Consent Mode and block ad initialization before valid consent signal
+- Ad Ops: enforce Consent Mode before ad initialization; block personalized ads without opt-in while allowing contextual ads per [CONSENT_POLICY.md](CONSENT_POLICY.md)
 
 **Done when:**
 - Consent state is captured before ad/measurement activation
@@ -72,7 +72,7 @@
 
 ## Next
 
-- PM: approve consent model and production rollout criteria
+- PM: define production rollout criteria
 - Full-Stack + Ad Ops: set production AdSense IDs and consent-gated ad initialization
 - SEO + UX/UI: refine legal/privacy page structure, metadata, and footer discoverability
 - Ad Ops: iterate ad placement by RPM/CTR data
