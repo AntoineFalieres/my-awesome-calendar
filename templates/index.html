@@ -18,10 +18,6 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
-    <link
-        href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-        rel="stylesheet"
-    >
     <style>
         :root {
             color-scheme: light;
@@ -36,6 +32,102 @@
             border-radius: 0.75rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             padding: 1rem;
+        }
+
+        .calendar-toolbar {
+            align-items: center;
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: 1fr auto 1fr;
+            margin-bottom: 0.75rem;
+        }
+
+        .calendar-period-actions,
+        .calendar-view-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .calendar-view-actions {
+            justify-content: flex-end;
+        }
+
+        .calendar-title {
+            font-size: 1.15rem;
+            margin: 0;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .calendar-day-list {
+            border: 1px solid #e4e8ef;
+            border-radius: 0.5rem;
+            list-style: none;
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .calendar-month-heading {
+            background-color: #f1f3f7;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            text-transform: capitalize;
+        }
+
+        .calendar-day-row {
+            align-items: start;
+            display: grid;
+            gap: 0.5rem;
+            grid-template-columns: 1.5rem 1.5rem minmax(0, 1fr);
+            padding: 0.35rem 0.5rem;
+        }
+
+        .calendar-day-row + .calendar-day-row {
+            border-top: 1px solid #edf0f5;
+        }
+
+        .calendar-day-row.weekend {
+            background-color: #fff1ed;
+        }
+
+        .calendar-day-row.sunday {
+            background-color: #ff8c70;
+        }
+
+        .calendar-weekday {
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .calendar-day-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .calendar-day-name {
+            min-width: 0;
+        }
+
+        .calendar-day-name.unavailable {
+            color: #6c757d;
+        }
+
+        .calendar-day-events {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.75rem;
+            grid-column: 3;
+        }
+
+        .calendar-event-public {
+            font-weight: 700;
+        }
+
+        .calendar-event-school {
+            color: #a52c2c;
         }
 
         .ad-slot {
@@ -69,44 +161,59 @@
             min-height: 100px;
         }
 
-        .month-card {
-            background: #ffffff;
-            border: 1px solid #e4e8ef;
-            border-radius: 0.75rem;
-            padding: 0.875rem;
-            margin-bottom: 0.875rem;
-        }
-
-        .month-card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .holiday-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .holiday-item {
-            border-top: 1px solid #edf0f5;
-            padding: 0.55rem 0;
-        }
-
-        .holiday-item:first-child {
-            border-top: 0;
-            padding-top: 0;
-        }
-
-        .holiday-date {
-            color: #0d6efd;
-            font-weight: 600;
-            margin-right: 0.45rem;
-        }
-
         @media (min-width: 768px) {
             .calendar-shell {
                 padding: 1.25rem;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .calendar-toolbar {
+                grid-template-columns: 1fr auto;
+            }
+
+            .calendar-title {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            .calendar-period-actions {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .calendar-view-actions {
+                grid-column: 2;
+                grid-row: 2;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .calendar-shell {
+                padding: 0.65rem;
+            }
+
+            .calendar-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-period-actions,
+            .calendar-view-actions {
+                grid-column: 1;
+                justify-content: center;
+            }
+
+            .calendar-period-actions {
+                grid-row: 2;
+            }
+
+            .calendar-view-actions {
+                grid-row: 3;
+            }
+
+            .calendar-view-actions .btn {
+                padding-left: 0.4rem;
+                padding-right: 0.4rem;
             }
         }
     </style>
@@ -161,11 +268,29 @@
 
         <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
 
-        <section class="calendar-shell mb-3 d-none d-md-block" aria-label="Desktop calendar">
-            <div id="calendar"></div>
+        <section class="calendar-shell mb-3" aria-label="Calendrier quotidien">
+            <div class="calendar-toolbar">
+                <div class="calendar-period-actions" role="group" aria-label="Navigation du calendrier">
+                    <button id="previous-period" class="btn btn-outline-secondary" type="button" aria-label="Période précédente">
+                        &lsaquo;
+                    </button>
+                    <button id="today-period" class="btn btn-outline-secondary" type="button" aria-label="Afficher la période actuelle">
+                        Aujourd'hui
+                    </button>
+                    <button id="next-period" class="btn btn-outline-secondary" type="button" aria-label="Période suivante">
+                        &rsaquo;
+                    </button>
+                </div>
+                <h2 id="calendar-title" class="calendar-title" aria-live="polite"></h2>
+                <div class="calendar-view-actions" role="group" aria-label="Affichage du calendrier">
+                    <button class="btn btn-outline-primary" type="button" data-calendar-view="week" aria-label="Vue semaine" aria-pressed="false">Semaine</button>
+                    <button class="btn btn-primary" type="button" data-calendar-view="month" aria-label="Vue mois" aria-pressed="true">Mois</button>
+                    <button class="btn btn-outline-primary" type="button" data-calendar-view="semester" aria-label="Vue semestre" aria-pressed="false">Semestre</button>
+                    <button class="btn btn-outline-primary" type="button" data-calendar-view="year" aria-label="Vue année" aria-pressed="false">Année</button>
+                </div>
+            </div>
+            <ol id="calendar-days" class="calendar-day-list" aria-label="Jours affichés"></ol>
         </section>
-
-        <section id="mobile-holiday-list" class="d-md-none" aria-label="Mobile holiday list"></section>
 
         <section class="my-3" aria-label="Inline ad slot">
             <div class="ad-slot ad-slot-inline" id="ad-slot-inline">
@@ -203,16 +328,23 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const PAGE_TYPE = {{ page_type|tojson }};
         const yearSelect = document.getElementById("year-select");
         const zoneSelect = document.getElementById("zone-select");
-        const mobileHolidayList = document.getElementById("mobile-holiday-list");
         const errorMessage = document.getElementById("error-message");
+        const calendarDays = document.getElementById("calendar-days");
+        const calendarTitle = document.getElementById("calendar-title");
+        const previousPeriodButton = document.getElementById("previous-period");
+        const nextPeriodButton = document.getElementById("next-period");
         const currentYear = new Date().getFullYear();
-        let calendar;
+        const FIRST_YEAR = 2025;
+        const LAST_YEAR = 2030;
+        const calendarViewButtons = document.querySelectorAll("[data-calendar-view]");
+        let calendarView = "month";
+        let activeDate = new Date();
+        let dataRequestVersion = 0;
 
         function populateYearDropdown() {
             yearSelect.innerHTML = "";
@@ -227,20 +359,6 @@
             }
         }
 
-        function initializeCalendar() {
-            calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
-                initialView: "dayGridMonth",
-                firstDay: 1,
-                headerToolbar: {
-                    left: "prev,next today",
-                    center: "title",
-                    right: "dayGridMonth"
-                },
-                height: "auto"
-            });
-            calendar.render();
-        }
-
         async function fetchJson(url) {
             const response = await fetch(url);
             if (!response.ok) {
@@ -249,64 +367,6 @@
                 throw new Error(message);
             }
             return response.json();
-        }
-
-        function sortEventsByDate(events) {
-            return [...events].sort((a, b) => a.start.localeCompare(b.start));
-        }
-
-        function renderMobileHolidayList(events) {
-            mobileHolidayList.innerHTML = "";
-
-            const grouped = {};
-            for (const event of events) {
-                const [year, month] = event.start.split("-");
-                const key = `${year}-${month}`;
-                if (!grouped[key]) {
-                    grouped[key] = [];
-                }
-                grouped[key].push(event);
-            }
-
-            const months = Object.keys(grouped).sort();
-            months.forEach((monthKey, index) => {
-                const monthCard = document.createElement("article");
-                monthCard.className = "month-card";
-
-                const [year, month] = monthKey.split("-");
-                const title = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric"
-                });
-
-                const heading = document.createElement("h2");
-                heading.textContent = title;
-                monthCard.appendChild(heading);
-
-                const list = document.createElement("ul");
-                list.className = "holiday-list";
-
-                grouped[monthKey].forEach((event) => {
-                    const item = document.createElement("li");
-                    item.className = "holiday-item";
-                    const dateText = new Date(event.start).toLocaleDateString("en-US", {
-                        day: "2-digit",
-                        month: "short"
-                    });
-                    item.innerHTML = `<span class="holiday-date">${dateText}</span>${event.title}`;
-                    list.appendChild(item);
-                });
-
-                monthCard.appendChild(list);
-                mobileHolidayList.appendChild(monthCard);
-
-                if ((index + 1) % 3 === 0 && index !== months.length - 1) {
-                    const inFeedAd = document.createElement("div");
-                    inFeedAd.className = "ad-slot ad-slot-inline mb-3";
-                    inFeedAd.setAttribute("aria-label", "In-feed ad slot");
-                    mobileHolidayList.appendChild(inFeedAd);
-                }
-            });
         }
 
         function buildEventJsonLd(events) {
@@ -356,6 +416,249 @@
         function hideError() {
             errorMessage.textContent = "";
             errorMessage.classList.add("d-none");
+        }
+
+        function formatDateKey(value) {
+            return [
+                value.getFullYear(),
+                String(value.getMonth() + 1).padStart(2, "0"),
+                String(value.getDate()).padStart(2, "0")
+            ].join("-");
+        }
+
+        function getCalendarRange() {
+            const year = activeDate.getFullYear();
+            const month = activeDate.getMonth();
+
+            if (calendarView === "week") {
+                const start = new Date(year, month, activeDate.getDate(), 12);
+                start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+                const end = new Date(start);
+                end.setDate(end.getDate() + 6);
+                return { start, end };
+            }
+
+            if (calendarView === "semester") {
+                const startMonth = month < 6 ? 0 : 6;
+                return {
+                    start: new Date(year, startMonth, 1, 12),
+                    end: new Date(year, startMonth + 6, 0, 12)
+                };
+            }
+
+            if (calendarView === "year") {
+                return {
+                    start: new Date(year, 0, 1, 12),
+                    end: new Date(year, 11, 31, 12)
+                };
+            }
+
+            return {
+                start: new Date(year, month, 1, 12),
+                end: new Date(year, month + 1, 0, 12)
+            };
+        }
+
+        function getRangeYears(range) {
+            const years = [];
+            for (let year = range.start.getFullYear(); year <= range.end.getFullYear(); year += 1) {
+                years.push(year);
+            }
+            return years;
+        }
+
+        function updateCalendarTitle(range) {
+            if (calendarView === "year") {
+                calendarTitle.textContent = String(range.start.getFullYear());
+                return;
+            }
+
+            if (calendarView === "semester") {
+                const startLabel = range.start.toLocaleDateString("fr-FR", { month: "long" });
+                const endLabel = range.end.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+                calendarTitle.textContent = `${startLabel} – ${endLabel}`;
+                return;
+            }
+
+            if (calendarView === "week") {
+                const dateOptions = { day: "numeric", month: "short" };
+                const yearSuffix = range.start.getFullYear() === range.end.getFullYear()
+                    ? ` ${range.end.getFullYear()}`
+                    : ` ${range.start.getFullYear()} – ${range.end.getFullYear()}`;
+                calendarTitle.textContent =
+                    `${range.start.toLocaleDateString("fr-FR", dateOptions)} – ` +
+                    `${range.end.toLocaleDateString("fr-FR", dateOptions)}${yearSuffix}`;
+                return;
+            }
+
+            calendarTitle.textContent = range.start.toLocaleDateString("fr-FR", {
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        function updateCalendarControls() {
+            calendarViewButtons.forEach((button) => {
+                const selected = button.dataset.calendarView === calendarView;
+                button.setAttribute("aria-pressed", String(selected));
+                button.classList.toggle("btn-primary", selected);
+                button.classList.toggle("btn-outline-primary", !selected);
+            });
+
+            const previousDate = new Date(activeDate);
+            const nextDate = new Date(activeDate);
+            shiftDate(previousDate, -1);
+            shiftDate(nextDate, 1);
+            previousPeriodButton.disabled = previousDate.getFullYear() < FIRST_YEAR;
+            nextPeriodButton.disabled = nextDate.getFullYear() > LAST_YEAR;
+        }
+
+        function shiftDate(value, direction) {
+            if (calendarView === "week") {
+                value.setDate(value.getDate() + direction * 7);
+            } else if (calendarView === "semester") {
+                value.setMonth(value.getMonth() + direction * 6, 1);
+            } else if (calendarView === "year") {
+                value.setFullYear(value.getFullYear() + direction, 0, 1);
+            } else {
+                value.setMonth(value.getMonth() + direction, 1);
+            }
+        }
+
+        function renderDailyCalendar(nameDays, events) {
+            const range = getCalendarRange();
+            calendarDays.innerHTML = "";
+            updateCalendarTitle(range);
+            updateCalendarControls();
+
+            const namesByDate = new Map(nameDays.map((entry) => [entry.date, entry.name]));
+            for (let day = new Date(range.start); day <= range.end; day.setDate(day.getDate() + 1)) {
+                const dayKey = formatDateKey(day);
+                if (
+                    (calendarView === "semester" || calendarView === "year") &&
+                    day.getDate() === 1
+                ) {
+                    const monthHeading = document.createElement("li");
+                    monthHeading.className = "calendar-month-heading";
+                    monthHeading.textContent = day.toLocaleDateString("fr-FR", {
+                        month: "long",
+                        year: "numeric"
+                    });
+                    calendarDays.appendChild(monthHeading);
+                }
+
+                const row = document.createElement("li");
+                row.className = "calendar-day-row";
+                row.setAttribute(
+                    "aria-label",
+                    day.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+                );
+                if (day.getDay() === 0) {
+                    row.classList.add("weekend", "sunday");
+                } else if (day.getDay() === 6) {
+                    row.classList.add("weekend");
+                }
+
+                const weekday = document.createElement("span");
+                weekday.className = "calendar-weekday";
+                weekday.setAttribute("aria-hidden", "true");
+                weekday.textContent = day.toLocaleDateString("fr-FR", { weekday: "narrow" }).toLocaleUpperCase("fr-FR");
+
+                const dateNumber = document.createElement("time");
+                dateNumber.className = "calendar-day-number";
+                dateNumber.dateTime = dayKey;
+                dateNumber.textContent = String(day.getDate());
+
+                const name = document.createElement("span");
+                name.className = "calendar-day-name";
+                const nameText = namesByDate.get(dayKey);
+                if (nameText) {
+                    name.textContent = nameText;
+                } else {
+                    name.classList.add("unavailable");
+                    name.textContent = "—";
+                    name.setAttribute("aria-label", "Nom du jour indisponible");
+                }
+
+                row.append(weekday, dateNumber, name);
+
+                const normalizedName = (nameText || "").trim().toLocaleLowerCase("fr-FR");
+                const dayEvents = events.filter((event) => {
+                    const eventEnd = event.end || event.start;
+                    const isOnDay = event.start <= dayKey && eventEnd >= dayKey;
+                    const isDuplicateName = event.title.trim().toLocaleLowerCase("fr-FR") === normalizedName;
+                    return isOnDay && !isDuplicateName;
+                });
+                if (dayEvents.length > 0) {
+                    const eventList = document.createElement("div");
+                    eventList.className = "calendar-day-events";
+                    dayEvents.forEach((event) => {
+                        const eventLabel = document.createElement("span");
+                        eventLabel.className = event.holidayType === "public"
+                            ? "calendar-event-public"
+                            : "calendar-event-school";
+                        eventLabel.textContent = event.title;
+                        eventList.appendChild(eventLabel);
+                    });
+                    row.appendChild(eventList);
+                }
+                calendarDays.appendChild(row);
+            }
+        }
+
+        async function fetchYearCalendarData(year, zone) {
+            const requests = [
+                fetchJson(`/api/holidays/france/${year}`),
+                fetchJson(`/api/name-days/france/${year}`)
+            ];
+            if (year === 2025 || year === 2026) {
+                requests.push(fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`));
+            }
+            return Promise.allSettled(requests);
+        }
+
+        async function refreshCalendarData() {
+            const requestVersion = ++dataRequestVersion;
+            hideError();
+            const zone = zoneSelect.value;
+            const years = getRangeYears(getCalendarRange());
+            const yearResults = await Promise.all(
+                years.map((year) => fetchYearCalendarData(year, zone))
+            );
+            if (requestVersion !== dataRequestVersion) {
+                return;
+            }
+
+            const nameDays = [];
+            const events = [];
+            const errors = [];
+            yearResults.forEach((results, index) => {
+                const year = years[index];
+                const [publicResult, nameDaysResult, schoolResult] = results;
+                if (publicResult.status === "fulfilled") {
+                    events.push(...publicResult.value);
+                } else {
+                    errors.push(`Jours fériés ${year} : ${publicResult.reason.message || "données indisponibles"}.`);
+                }
+                if (nameDaysResult.status === "fulfilled") {
+                    nameDays.push(...nameDaysResult.value);
+                } else {
+                    errors.push(`Saints ${year} : ${nameDaysResult.reason.message || "données indisponibles"}.`);
+                }
+                if (schoolResult && schoolResult.status === "fulfilled") {
+                    events.push(...schoolResult.value);
+                } else if (schoolResult && schoolResult.status === "rejected") {
+                    errors.push(`Vacances scolaires ${year} : ${schoolResult.reason.message || "données indisponibles"}.`);
+                }
+            });
+
+            renderDailyCalendar(nameDays, events);
+            updateJsonLd(events);
+            if (errors.length > 0) {
+                showError(errors.join(" "));
+            } else {
+                hideError();
+            }
         }
 
         function trackRevenueEvent(eventPayload) {
@@ -411,45 +714,67 @@
             });
         }
 
-        async function refreshHolidays() {
-            const year = yearSelect.value;
-            const zone = zoneSelect.value;
-
-            hideError();
-
-            try {
-                const publicHolidays = await fetchJson(`/api/holidays/france/${year}`);
-
-                let schoolHolidays = [];
-                if (Number(year) === 2025 || Number(year) === 2026) {
-                    schoolHolidays = await fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`);
-                }
-
-                const allEvents = sortEventsByDate([...publicHolidays, ...schoolHolidays]);
-
-                calendar.removeAllEvents();
-                if (allEvents.length > 0) {
-                    calendar.addEventSource(allEvents);
-                }
-
-                renderMobileHolidayList(allEvents);
-                updateJsonLd(allEvents);
-            } catch (error) {
-                calendar.removeAllEvents();
-                mobileHolidayList.innerHTML = "";
-                showError(error.message || "Unable to load holiday data.");
+        function changeCalendarView(view) {
+            calendarView = view;
+            if (view === "year") {
+                activeDate = new Date(Number(yearSelect.value), 0, 1, 12);
+            } else if (view === "semester") {
+                const startMonth = activeDate.getMonth() < 6 ? 0 : 6;
+                activeDate = new Date(Number(yearSelect.value), startMonth, 1, 12);
             }
+            refreshCalendarData();
+        }
+
+        function navigateCalendar(direction) {
+            shiftDate(activeDate, direction);
+            yearSelect.value = String(activeDate.getFullYear());
+            refreshCalendarData();
+        }
+
+        function selectCalendarYear() {
+            const year = Number(yearSelect.value);
+            const month = calendarView === "year" ? 0 : activeDate.getMonth();
+            const day = calendarView === "year" ? 1 : Math.min(
+                activeDate.getDate(),
+                new Date(year, month + 1, 0).getDate()
+            );
+            activeDate = new Date(year, month, day, 12);
+            if (calendarView === "semester") {
+                activeDate = new Date(year, month < 6 ? 0 : 6, 1, 12);
+            }
+            refreshCalendarData();
         }
 
         function initializePage() {
             trackRevenueEvent({ eventType: "page_view", status: "viewed" });
             populateYearDropdown();
-            initializeCalendar();
+            activeDate = new Date(Number(yearSelect.value), new Date().getMonth(), new Date().getDate(), 12);
+            calendarViewButtons.forEach((button) => {
+                button.addEventListener("click", () => changeCalendarView(button.dataset.calendarView));
+            });
+            previousPeriodButton.addEventListener("click", () => navigateCalendar(-1));
+            nextPeriodButton.addEventListener("click", () => navigateCalendar(1));
+            document.getElementById("today-period").addEventListener("click", () => {
+                const today = new Date();
+                yearSelect.value = String(today.getFullYear());
+                activeDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12);
+                if (calendarView === "year") {
+                    activeDate = new Date(today.getFullYear(), 0, 1, 12);
+                } else if (calendarView === "semester") {
+                    activeDate = new Date(
+                        today.getFullYear(),
+                        today.getMonth() < 6 ? 0 : 6,
+                        1,
+                        12
+                    );
+                }
+                refreshCalendarData();
+            });
             initAds();
-            refreshHolidays();
+            refreshCalendarData();
 
-            yearSelect.addEventListener("change", refreshHolidays);
-            zoneSelect.addEventListener("change", refreshHolidays);
+            yearSelect.addEventListener("change", selectCalendarYear);
+            zoneSelect.addEventListener("change", refreshCalendarData);
         }
 
         if (document.readyState === "loading") {
