@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 import json
 import os
 import re
-from datetime import date
+from datetime import date, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -11,7 +11,13 @@ from holidays.registry import COUNTRIES as HOLIDAY_COUNTRIES
 
 app = Flask(__name__)
 NAGER_PUBLIC_HOLIDAYS_API = "https://date.nager.at/api/v3/PublicHolidays/{year}/FR"
+FR_NAME_DAYS_SOURCE_URL = (
+    "https://raw.githubusercontent.com/xnekv03/nameday-api/"
+    "8b1c18b8e0914c75bd8f0aa096b958755ac3e200/json/namedays.json"
+)
 FR_PUBLIC_HOLIDAYS_CACHE = {}
+FR_NAMEDAYS_CACHE = {}
+FR_NAME_DAYS_SOURCE_CACHE = None
 REVENUE_EVENT_COUNTS = {}
 FRANCE_SEO_YEARS = tuple(range(2025, 2031))
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-XXXXXXXXXXXXXXXX")
@@ -153,6 +159,70 @@ def fetch_fr_public_holidays(year):
 
     FR_PUBLIC_HOLIDAYS_CACHE[cache_key] = events
     return events
+
+
+def fetch_fr_name_days(year):
+    """Return French name-day labels for every date in a year."""
+    global FR_NAME_DAYS_SOURCE_CACHE
+
+    if year < 1900 or year > 2200:
+        raise ValueError("Year must be between 1900 and 2200")
+
+    cache_key = str(year)
+    if cache_key in FR_NAMEDAYS_CACHE:
+        return FR_NAMEDAYS_CACHE[cache_key]
+
+    if FR_NAME_DAYS_SOURCE_CACHE is None:
+        try:
+            with urlopen(FR_NAME_DAYS_SOURCE_URL, timeout=10) as response:
+                payload = response.read().decode("utf-8")
+            # The upstream calendar file contains JavaScript-style trailing commas.
+            source_entries = json.loads(re.sub(r",\s*([}\]])", r"\1", payload))
+        except HTTPError as error:
+            raise RuntimeError(f"Name-day API returned HTTP {error.code}") from error
+        except URLError as error:
+            raise RuntimeError("Failed to reach the name-day API") from error
+        except (json.JSONDecodeError, UnicodeDecodeError) as error:
+            raise RuntimeError("Name-day API returned invalid JSON data") from error
+        except TimeoutError as error:
+            raise RuntimeError("Name-day API request timed out") from error
+
+        if not isinstance(source_entries, list) or not source_entries:
+            raise RuntimeError("Name-day API returned an invalid calendar")
+
+        name_days = {}
+        for entry in source_entries:
+            if not isinstance(entry, dict):
+                continue
+            try:
+                month = int(entry["month"])
+                day = int(entry["day"])
+                date(2000, month, day)
+            except (KeyError, TypeError, ValueError):
+                continue
+
+            name = entry.get("fr")
+            if isinstance(name, str) and name.strip().lower() != "n/a":
+                name_days[(month, day)] = name.strip()
+
+        if not name_days:
+            raise RuntimeError("Name-day API returned no French name days")
+        FR_NAME_DAYS_SOURCE_CACHE = name_days
+
+    days = []
+    current_day = date(year, 1, 1)
+    last_day = date(year, 12, 31)
+    while current_day <= last_day:
+        days.append(
+            {
+                "date": current_day.isoformat(),
+                "name": FR_NAME_DAYS_SOURCE_CACHE.get((current_day.month, current_day.day)),
+            }
+        )
+        current_day += timedelta(days=1)
+
+    FR_NAMEDAYS_CACHE[cache_key] = days
+    return days
 
 
 def get_ad_config():
@@ -380,6 +450,17 @@ def get_france_holidays(year):
     """Return France public holidays from Nager.Date in FullCalendar format."""
     try:
         return jsonify(fetch_fr_public_holidays(year))
+    except ValueError as error:
+        return jsonify({'error': str(error)}), 400
+    except RuntimeError as error:
+        return jsonify({'error': str(error)}), 502
+
+
+@app.route('/api/name-days/france/<int:year>')
+def get_france_name_days(year):
+    """Return French name-day labels for a calendar year."""
+    try:
+        return jsonify(fetch_fr_name_days(year))
     except ValueError as error:
         return jsonify({'error': str(error)}), 400
     except RuntimeError as error:
