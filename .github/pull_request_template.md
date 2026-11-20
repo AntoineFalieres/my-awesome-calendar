@@ -1,6 +1,6 @@
 ## What type of PR is this?
 
-[Check all applicable using "X" and delete all non applicable]
+[Select exactly one using "X" and delete all non-applicable options.]
 
 - [ ] 🍕 Feature
 - [ ] 🐛 Bug Fix
@@ -14,9 +14,6 @@
 ## PR Description
 [Provide a brief description of what this PR achieves. Explain the problem it solves or the feature it adds.]
 
-## Breaking changes
-[Fill this section only when the PR impacts a column schema: column removal, column creation, column addition, or column type change. Otherwise leave `No breaking changes`.]
-
 ## Changes Made
 [List the specific changes you've made in this PR. Be detailed, especially if your PR includes multiple changes.]
 
@@ -25,6 +22,8 @@
 If you do not test locally all downstream models; bad things tend to happen.
 
 **PLEASE LOCALLY CHECK ALL DOWNSTREAM MODELS IN DEV!**
+
+Agents: check each item only after verifying it; leave unmet or unverified items unchecked.
 
 - [ ] Local Test Successful
 - [ ] All Checks Successful

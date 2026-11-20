@@ -30,7 +30,8 @@ uv run python .github/skills/github/pull-request-authoring-workflow/scripts/draf
 - Use `scripts/draft_pr.py` to bootstrap drafts from this skill folder.
 - Use GitHub MCP only for GitHub-side PR actions.
 - Use the repository template at `.github/pull_request_template.md` as the starting point for the PR body.
-- Keep the checklist visible, but do not pre-check any checklist items.
+- In the final PR body, select exactly one PR type (`[x]`) and remove the other PR type options.
+- Keep all checklist items visible. Check an item (`[x]`) only after verifying it; leave unmet or unverified items unchecked.
 - Include a clear PR description and an explicit list of changes.
 - The draft generator includes staged and unstaged tracked files only. Untracked files are excluded from its generated change list; add relevant untracked files manually before publishing.
 - Do not include secrets, credentials, or hardcoded sensitive values.
@@ -70,9 +71,9 @@ Rules:
 3. Build the PR title from the change type, scope, and imperative summary.
 4. Draft the PR body from `.github/pull_request_template.md`.
 5. Fill in the description, breaking changes section, and changes made section with repository-specific details.
-6. Leave checklist items unchecked.
+6. Select exactly one PR type and mark checklist items only when the agent has verified them.
 7. Create or update the PR with GitHub MCP.
-8. After creation or update, reload the PR and verify the title, rendered description, breaking changes and changes made sections, and unchecked checklist items. Correct any mismatch and verify again.
+8. After creation or update, reload the PR and verify the title, rendered description, breaking changes and changes made sections, exactly one selected PR type, and checklist marks against available validation evidence. Correct any mismatch and verify again.
 
 ## Review Checks
 
@@ -80,7 +81,8 @@ Before finalizing the PR, confirm:
 
 - The title matches the required conventional format.
 - The template sections are preserved.
-- Checklist boxes remain unchecked.
+- Exactly one PR type is selected, and all other type options are removed.
+- Checklist items are checked only when verified; unmet or unverified items remain unchecked.
 - The rendered markdown displays headings, bullets, and checklist items on separate lines.
 
 ## Notes
