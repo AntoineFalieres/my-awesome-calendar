@@ -170,21 +170,27 @@ Returns a server-rendered list page of France public holidays for the selected y
 Returns a server-rendered list page of school holidays for zone `A`, `B`, or `C`.
 
 #### POST `/api/metrics/revenue`
-Collects page-type and ad initialization revenue tracking events.
+Collects page-type and ad initialization revenue tracking events. Only known event types and slug-formatted fields are accepted, the number of distinct counters is capped, and each client is limited to 60 requests per minute. The site only sends these events after analytics consent.
 
 #### GET `/api/metrics/revenue/summary`
-Returns in-memory aggregated revenue tracking counters.
+Returns in-memory aggregated revenue tracking counters. Requires the `X-Metrics-Token` header to match `METRICS_TOKEN`; responds `404` when the token is missing, wrong, or not configured.
 
-## ⚙️ Ad Configuration
+#### GET `/sitemap.xml` and `/robots.txt`
+Sitemap of every crawlable page with content (school-holiday pages exist only for years with data) and a robots file that blocks `/api/`.
 
-AdSense values are now environment-driven:
+## ⚙️ Site, Ad and Consent Configuration
 
+All values are environment-driven:
+
+- `SITE_URL` (example: `https://calendar.example.fr`): base URL for canonical links, the sitemap and robots.txt. Falls back to the request host.
+- `APP_ENV`: set to `production` to refuse startup when ad or consent settings are placeholders.
 - `ADSENSE_CLIENT_ID` (example: `ca-pub-1234567890`)
-- `ADSENSE_SLOT_HEADER`
 - `ADSENSE_SLOT_INLINE`
 - `ADSENSE_SLOT_FOOTER`
+- `CMP_SCRIPT_URL`: loader script of a Google-certified TCF consent management platform.
+- `METRICS_TOKEN`: enables the metrics summary endpoint.
 
-If not provided, safe placeholder defaults are used.
+Ads render only when `ADSENSE_CLIENT_ID` is a real value **and** `CMP_SCRIPT_URL` is set. The AdSense script is injected by `static/site.js` only after the CMP reports consent (TCF purpose 1; analytics events need purposes 7 and 8; personalized ads need purposes 1, 3 and 4, otherwise non-personalized requests are made). Ads are never shown on legal pages. In production, `ads.txt` must also contain a real publisher ID.
 
 ## 🤖 Planning Docs Automation
 
@@ -281,7 +287,7 @@ To add more features:
 
 ### Adding More Years for French School Holidays
 
-Edit the `FR_SCHOOL_HOLIDAYS_ZONES` dictionary in `app.py` to add more years.
+Add `(first day off, last day off)` periods for each zone to the `FR_SCHOOL_HOLIDAYS_ZONES` dictionary in `app.py` (official dates: data.education.gouv.fr).
 
 ## 📝 License
 

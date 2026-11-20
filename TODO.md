@@ -17,6 +17,7 @@
 - [x] Improve legal/privacy template metadata to match SEO checks.
 - [x] Add legal footer links and dedicated legal routes/pages (`/mentions-legales`, `/privacy-policy`).
 - [x] Add GDPR consent script placeholder in base homepage head.
+- [x] Redesign the calendar in a Google Calendar style (week, month, semester and year grid views).
 - [ ] Set production AdSense values in deployment environment variables.
 
 ## P2 - Deferred until traffic baseline

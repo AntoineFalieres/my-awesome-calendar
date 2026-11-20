@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendrier des vacances en France | Jours fériés et zones scolaires</title>
-    <meta
-        name="description"
-        content="Consultez les jours fériés et vacances scolaires en France par année et zone, avec un calendrier rapide et mobile-first."
-    >
-    <link rel="canonical" href="{{ canonical_url }}">
-    <script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_config.client_id }}"
-        crossorigin="anonymous"
-    ></script>
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+{% extends "base.html" %}
+{% from "_ads.html" import ad_slot with context %}
+{% set page_title = "Calendrier des vacances en France : jours fériés et zones scolaires | " ~ site_name %}
+{% set page_description = "Consultez les jours fériés et vacances scolaires en France par année et zone, avec un calendrier rapide et mobile-first." %}
+
+{% block head_extra %}
+    <link href="{{ url_for('static', filename='calendar.css') }}" rel="stylesheet">
     <style>
         :root {
             color-scheme: light;
@@ -60,105 +47,20 @@
             text-transform: capitalize;
         }
 
-        .calendar-day-list {
-            border: 1px solid #e4e8ef;
-            border-radius: 0.5rem;
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            gap: 0.25rem 1rem;
             list-style: none;
-            margin: 0;
-            overflow: hidden;
+            margin: 0 0 0.75rem;
             padding: 0;
         }
 
-        .calendar-month-heading {
-            background-color: #f1f3f7;
-            font-size: 0.95rem;
-            font-weight: 600;
-            padding: 0.4rem 0.5rem;
-            text-transform: capitalize;
-        }
-
-        .calendar-day-row {
-            align-items: start;
-            display: grid;
-            gap: 0.5rem;
-            grid-template-columns: 1.5rem 1.5rem minmax(0, 1fr);
-            padding: 0.35rem 0.5rem;
-        }
-
-        .calendar-day-row + .calendar-day-row {
-            border-top: 1px solid #edf0f5;
-        }
-
-        .calendar-day-row.weekend {
-            background-color: #fff1ed;
-        }
-
-        .calendar-day-row.sunday {
-            background-color: #ff8c70;
-        }
-
-        .calendar-weekday {
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .calendar-day-number {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .calendar-day-name {
-            min-width: 0;
-        }
-
-        .calendar-day-name.unavailable {
-            color: #6c757d;
-        }
-
-        .calendar-day-events {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem 0.75rem;
-            grid-column: 3;
-        }
-
-        .calendar-event-public {
-            font-weight: 700;
-        }
-
-        .calendar-event-school {
-            color: #a52c2c;
-        }
-
-        .ad-slot {
-            background: #eef2f7;
-            border: 1px dashed #b8c2d1;
-            border-radius: 0.5rem;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .ad-slot .adsbygoogle {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ad-slot-fallback {
-            background: #f1f3f7;
-            border-color: #d4dbe8;
-        }
-
-        .ad-slot-header {
-            min-height: 90px;
-        }
-
-        .ad-slot-inline {
-            min-height: 120px;
-        }
-
-        .ad-slot-footer {
-            min-height: 100px;
+        .calendar-period-actions .btn,
+        .calendar-view-actions .btn {
+            min-height: 44px;
+            min-width: 44px;
         }
 
         @media (min-width: 768px) {
@@ -217,68 +119,53 @@
             }
         }
     </style>
-</head>
-<body>
-    <header class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">Calendrier France</span>
-        </div>
-    </header>
+{% endblock %}
 
-    <main class="container py-3 py-md-4">
+{% block main_class %}py-3 py-md-4{% endblock %}
+
+{% block content %}
         <section class="mb-3">
             <h1 class="h4 mb-2">Jours fériés et vacances scolaires en France</h1>
             <p class="text-muted mb-3">
                 Consultez les dates officielles par année et zone scolaire dans une interface optimisée mobile.
             </p>
-            <p class="mb-3">
-                <a href="/france/{{ current_year }}" class="link-primary text-decoration-none">
-                    Explorer les pages France {{ current_year }}
-                </a>
+            <p class="form-text mb-0">
+                Les vacances scolaires des zones A, B et C sont affichées ensemble ; la zone dépend de l'académie de l'établissement.
             </p>
-            <div class="row g-2">
-                <div class="col-6 col-md-3">
-                    <label for="year-select" class="form-label mb-1">Année</label>
-                    <select id="year-select" class="form-select" aria-label="Année"></select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="zone-select" class="form-label mb-1">Zone scolaire</label>
-                    <select id="zone-select" class="form-select" aria-label="Zone scolaire">
-                        <option value="A">Zone A</option>
-                        <option value="B">Zone B</option>
-                        <option value="C">Zone C</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <section class="mb-3" aria-label="Top ad slot">
-            <div class="ad-slot ad-slot-header" id="ad-slot-header">
-                <ins
-                    class="adsbygoogle"
-                    style="display:block;min-height:90px"
-                    data-ad-client="{{ ad_config.client_id }}"
-                    data-ad-slot="{{ ad_config.slot_header }}"
-                    data-slot-name="header"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                ></ins>
-            </div>
         </section>
 
         <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
 
+        <p id="next-holiday" class="alert alert-info py-2 d-none" role="status"></p>
+
+        <section class="year-banner" aria-label="Navigation par année">
+            <button id="banner-prev-year" class="year-banner-nav year-banner-prev" type="button">
+                <span class="year-banner-chevron" aria-hidden="true"></span>
+                <span id="banner-prev-year-label"></span>
+            </button>
+            <h2 class="year-banner-title" aria-live="polite">
+                <span class="year-banner-kicker">Calendrier</span>
+                <span id="banner-year"></span>
+            </h2>
+            <button id="banner-next-year" class="year-banner-nav year-banner-next" type="button">
+                <span id="banner-next-year-label"></span>
+                <span class="year-banner-chevron" aria-hidden="true"></span>
+            </button>
+        </section>
+
         <section class="calendar-shell mb-3" aria-label="Calendrier quotidien">
             <div class="calendar-toolbar">
                 <div class="calendar-period-actions" role="group" aria-label="Navigation du calendrier">
-                    <button id="previous-period" class="btn btn-outline-secondary" type="button" aria-label="Période précédente">
-                        &lsaquo;
+                    <button id="previous-period" class="btn btn-outline-secondary" type="button">
+                        <span aria-hidden="true">&lsaquo;</span>
+                        <span class="visually-hidden">Période précédente</span>
                     </button>
                     <button id="today-period" class="btn btn-outline-secondary" type="button" aria-label="Afficher la période actuelle">
                         Aujourd'hui
                     </button>
-                    <button id="next-period" class="btn btn-outline-secondary" type="button" aria-label="Période suivante">
-                        &rsaquo;
+                    <button id="next-period" class="btn btn-outline-secondary" type="button">
+                        <span aria-hidden="true">&rsaquo;</span>
+                        <span class="visually-hidden">Période suivante</span>
                     </button>
                 </div>
                 <h2 id="calendar-title" class="calendar-title" aria-live="polite"></h2>
@@ -289,75 +176,70 @@
                     <button class="btn btn-outline-primary" type="button" data-calendar-view="year" aria-label="Vue année" aria-pressed="false">Année</button>
                 </div>
             </div>
-            <ol id="calendar-days" class="calendar-day-list" aria-label="Jours affichés"></ol>
+            <ul class="calendar-legend" aria-label="Légende (cliquer sur une zone pour filtrer)">
+                <li><button type="button" class="cal-chip public cal-legend-toggle" data-filter-toggle="public" aria-pressed="true">Jour férié</button></li>
+                {% for zone in ["A", "B", "C"] %}
+                <li><button type="button" class="cal-chip school zone-{{ zone }} cal-legend-toggle" data-filter-toggle="{{ zone }}" aria-pressed="false">Vacances zone {{ zone }}</button></li>
+                {% endfor %}
+            </ul>
+            <div id="calendar-days" class="calendar-board" data-view="month" aria-label="Jours affichés"></div>
+            <div id="day-detail" class="cal-detail" aria-live="polite" hidden></div>
+            <div id="period-events" class="cal-period" hidden></div>
         </section>
 
-        <section class="my-3" aria-label="Inline ad slot">
-            <div class="ad-slot ad-slot-inline" id="ad-slot-inline">
-                <ins
-                    class="adsbygoogle"
-                    style="display:block;min-height:120px"
-                    data-ad-client="{{ ad_config.client_id }}"
-                    data-ad-slot="{{ ad_config.slot_inline }}"
-                    data-slot-name="inline"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                ></ins>
-            </div>
-        </section>
+        {{ ad_slot("inline", "inline") }}
 
-        <section class="my-3" aria-label="Footer ad slot">
-            <div class="ad-slot ad-slot-footer" id="ad-slot-footer">
-                <ins
-                    class="adsbygoogle"
-                    style="display:block;min-height:100px"
-                    data-ad-client="{{ ad_config.client_id }}"
-                    data-ad-slot="{{ ad_config.slot_footer }}"
-                    data-slot-name="footer"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                ></ins>
-            </div>
-        </section>
-    </main>
+        <nav class="mb-3" aria-label="Pages par année">
+            <h2 class="h6">Pages par année</h2>
+            <ul class="list-inline mb-2">
+                {% for year in france_years %}
+                <li class="list-inline-item"><a href="/france/{{ year }}">France {{ year }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="list-inline mb-0">
+                {% for zone in ["A", "B", "C"] %}
+                {% for year in school_years %}
+                <li class="list-inline-item"><a href="/france/{{ year }}/school-holidays/{{ zone }}">Zone {{ zone }} {{ year }}</a></li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </nav>
 
-    <footer class="py-3 border-top bg-white">
-        <div class="container text-center">
-            <a href="/mentions-legales" class="text-decoration-none me-3">Mentions Légales</a>
-            <a href="/privacy-policy" class="text-decoration-none">Privacy Policy</a>
-        </div>
-    </footer>
+        {{ ad_slot("footer", "footer") }}
+{% endblock %}
 
+{% block scripts_before %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block scripts %}
     <script>
-        const PAGE_TYPE = {{ page_type|tojson }};
-        const yearSelect = document.getElementById("year-select");
-        const zoneSelect = document.getElementById("zone-select");
         const errorMessage = document.getElementById("error-message");
         const calendarDays = document.getElementById("calendar-days");
+        const dayDetail = document.getElementById("day-detail");
+        const periodEvents = document.getElementById("period-events");
         const calendarTitle = document.getElementById("calendar-title");
         const previousPeriodButton = document.getElementById("previous-period");
         const nextPeriodButton = document.getElementById("next-period");
-        const currentYear = new Date().getFullYear();
+        const bannerYear = document.getElementById("banner-year");
+        const bannerPrevButton = document.getElementById("banner-prev-year");
+        const bannerNextButton = document.getElementById("banner-next-year");
+        const bannerPrevLabel = document.getElementById("banner-prev-year-label");
+        const bannerNextLabel = document.getElementById("banner-next-year-label");
         const FIRST_YEAR = 2025;
         const LAST_YEAR = 2030;
+        const SCHOOL_ZONES = ["A", "B", "C"];
+        const SCHOOL_YEARS = {{ school_years|tojson }};
         const calendarViewButtons = document.querySelectorAll("[data-calendar-view]");
+        const MAX_MONTH_CHIPS = 3;
         let calendarView = "month";
         let activeDate = new Date();
         let dataRequestVersion = 0;
-
-        function populateYearDropdown() {
-            yearSelect.innerHTML = "";
-            for (let year = 2025; year <= 2030; year += 1) {
-                const option = document.createElement("option");
-                option.value = String(year);
-                option.textContent = String(year);
-                if (year === currentYear) {
-                    option.selected = true;
-                }
-                yearSelect.appendChild(option);
-            }
-        }
+        let calendarData = { namesByDate: new Map(), eventsByDate: new Map(), events: [] };
+        let selectedDateKey = null;
+        let lastRender = null;
+        const selectedFilters = new Set();
+        let showPublicHolidays = true;
 
         async function fetchJson(url) {
             const response = await fetch(url);
@@ -426,6 +308,23 @@
             ].join("-");
         }
 
+        // ISO 8601 week number: the week containing the Thursday decides the week-year.
+        function getIsoWeek(value) {
+            const thursday = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 12);
+            thursday.setDate(thursday.getDate() + 3 - ((thursday.getDay() + 6) % 7));
+            const firstThursday = new Date(thursday.getFullYear(), 0, 4, 12);
+            firstThursday.setDate(firstThursday.getDate() + 3 - ((firstThursday.getDay() + 6) % 7));
+            return 1 + Math.round((thursday - firstThursday) / (7 * 24 * 60 * 60 * 1000));
+        }
+
+        function createWeekNumber(className, day) {
+            const week = getIsoWeek(day);
+            const node = createElement("span", className, String(week));
+            node.title = `Semaine ${week}`;
+            node.setAttribute("aria-hidden", "true");
+            return node;
+        }
+
         function getCalendarRange() {
             const year = activeDate.getFullYear();
             const month = activeDate.getMonth();
@@ -459,9 +358,12 @@
             };
         }
 
+        // Years outside the supported window are skipped: padded week edges would otherwise trigger needless requests.
         function getRangeYears(range) {
             const years = [];
-            for (let year = range.start.getFullYear(); year <= range.end.getFullYear(); year += 1) {
+            const firstYear = Math.max(range.start.getFullYear(), FIRST_YEAR);
+            const lastYear = Math.min(range.end.getFullYear(), LAST_YEAR);
+            for (let year = firstYear; year <= lastYear; year += 1) {
                 years.push(year);
             }
             return years;
@@ -482,11 +384,12 @@
 
             if (calendarView === "week") {
                 const dateOptions = { day: "numeric", month: "short" };
+                const weekPrefix = `Semaine ${getIsoWeek(range.start)} · `;
                 const yearSuffix = range.start.getFullYear() === range.end.getFullYear()
                     ? ` ${range.end.getFullYear()}`
                     : ` ${range.start.getFullYear()} – ${range.end.getFullYear()}`;
                 calendarTitle.textContent =
-                    `${range.start.toLocaleDateString("fr-FR", dateOptions)} – ` +
+                    `${weekPrefix}${range.start.toLocaleDateString("fr-FR", dateOptions)} – ` +
                     `${range.end.toLocaleDateString("fr-FR", dateOptions)}${yearSuffix}`;
                 return;
             }
@@ -511,6 +414,38 @@
             shiftDate(nextDate, 1);
             previousPeriodButton.disabled = previousDate.getFullYear() < FIRST_YEAR;
             nextPeriodButton.disabled = nextDate.getFullYear() > LAST_YEAR;
+            // In year view the banner already moves between years.
+            previousPeriodButton.hidden = calendarView === "year";
+            nextPeriodButton.hidden = calendarView === "year";
+            updateYearBanner();
+        }
+
+        function updateYearBanner() {
+            const year = activeDate.getFullYear();
+            bannerYear.textContent = String(year);
+            bannerPrevButton.hidden = year <= FIRST_YEAR;
+            bannerNextButton.hidden = year >= LAST_YEAR;
+            bannerPrevLabel.textContent = String(year - 1);
+            bannerNextLabel.textContent = String(year + 1);
+            bannerPrevButton.setAttribute("aria-label", `Année ${year - 1}`);
+            bannerNextButton.setAttribute("aria-label", `Année ${year + 1}`);
+        }
+
+        function shiftYear(direction) {
+            const year = activeDate.getFullYear() + direction;
+            if (year < FIRST_YEAR || year > LAST_YEAR) {
+                return;
+            }
+            const month = calendarView === "year" ? 0 : activeDate.getMonth();
+            let day = 1;
+            if (calendarView !== "year") {
+                day = Math.min(activeDate.getDate(), new Date(year, month + 1, 0).getDate());
+            }
+            activeDate = new Date(year, month, day, 12);
+            if (calendarView === "semester") {
+                activeDate = new Date(year, month < 6 ? 0 : 6, 1, 12);
+            }
+            refreshCalendarData();
         }
 
         function shiftDate(value, direction) {
@@ -525,94 +460,502 @@
             }
         }
 
-        function renderDailyCalendar(nameDays, events) {
-            const range = getCalendarRange();
-            calendarDays.innerHTML = "";
-            updateCalendarTitle(range);
-            updateCalendarControls();
+        function updateNextHoliday(events) {
+            const nextHolidayNode = document.getElementById("next-holiday");
+            const today = new Date();
+            const todayKey = formatDateKey(today);
+            const upcoming = events
+                .filter((event) => event.holidayType === "public" && event.start >= todayKey)
+                .sort((first, second) => first.start.localeCompare(second.start))[0];
 
-            const namesByDate = new Map(nameDays.map((entry) => [entry.date, entry.name]));
-            for (let day = new Date(range.start); day <= range.end; day.setDate(day.getDate() + 1)) {
-                const dayKey = formatDateKey(day);
-                if (
-                    (calendarView === "semester" || calendarView === "year") &&
-                    day.getDate() === 1
-                ) {
-                    const monthHeading = document.createElement("li");
-                    monthHeading.className = "calendar-month-heading";
-                    monthHeading.textContent = day.toLocaleDateString("fr-FR", {
-                        month: "long",
-                        year: "numeric"
-                    });
-                    calendarDays.appendChild(monthHeading);
-                }
+            if (!upcoming) {
+                nextHolidayNode.classList.add("d-none");
+                nextHolidayNode.textContent = "";
+                return;
+            }
 
-                const row = document.createElement("li");
-                row.className = "calendar-day-row";
-                row.setAttribute(
-                    "aria-label",
-                    day.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
-                );
-                if (day.getDay() === 0) {
-                    row.classList.add("weekend", "sunday");
-                } else if (day.getDay() === 6) {
-                    row.classList.add("weekend");
-                }
+            const todayNoon = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12);
+            const [year, month, day] = upcoming.start.split("-").map(Number);
+            const daysLeft = Math.round((new Date(year, month - 1, day, 12) - todayNoon) / 86400000);
+            const label = new Date(year, month - 1, day, 12).toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long"
+            });
+            const delay = daysLeft === 0 ? "aujourd'hui" : daysLeft === 1 ? "demain" : `dans ${daysLeft} jours`;
+            nextHolidayNode.textContent = `Prochain jour férié : ${upcoming.title}, ${label} (${delay}).`;
+            nextHolidayNode.classList.remove("d-none");
+        }
 
-                const weekday = document.createElement("span");
-                weekday.className = "calendar-weekday";
-                weekday.setAttribute("aria-hidden", "true");
-                weekday.textContent = day.toLocaleDateString("fr-FR", { weekday: "narrow" }).toLocaleUpperCase("fr-FR");
+        function createElement(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) {
+                node.className = className;
+            }
+            if (text !== undefined) {
+                node.textContent = text;
+            }
+            return node;
+        }
 
-                const dateNumber = document.createElement("time");
-                dateNumber.className = "calendar-day-number";
-                dateNumber.dateTime = dayKey;
-                dateNumber.textContent = String(day.getDate());
+        function parseDateKey(key) {
+            const [year, month, day] = key.split("-").map(Number);
+            return new Date(year, month - 1, day, 12);
+        }
 
-                const name = document.createElement("span");
-                name.className = "calendar-day-name";
-                const nameText = namesByDate.get(dayKey);
-                if (nameText) {
-                    name.textContent = nameText;
-                } else {
-                    name.classList.add("unavailable");
-                    name.textContent = "—";
-                    name.setAttribute("aria-label", "Nom du jour indisponible");
-                }
+        function formatLongDate(day) {
+            return day.toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
 
-                row.append(weekday, dateNumber, name);
+        function formatShortDate(key) {
+            return parseDateKey(key).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+        }
 
-                const normalizedName = (nameText || "").trim().toLocaleLowerCase("fr-FR");
-                const dayEvents = events.filter((event) => {
-                    const eventEnd = event.end || event.start;
-                    const isOnDay = event.start <= dayKey && eventEnd >= dayKey;
-                    const isDuplicateName = event.title.trim().toLocaleLowerCase("fr-FR") === normalizedName;
-                    return isOnDay && !isDuplicateName;
-                });
-                if (dayEvents.length > 0) {
-                    const eventList = document.createElement("div");
-                    eventList.className = "calendar-day-events";
-                    dayEvents.forEach((event) => {
-                        const eventLabel = document.createElement("span");
-                        eventLabel.className = event.holidayType === "public"
-                            ? "calendar-event-public"
-                            : "calendar-event-school";
-                        eventLabel.textContent = event.title;
-                        eventList.appendChild(eventLabel);
-                    });
-                    row.appendChild(eventList);
-                }
-                calendarDays.appendChild(row);
+        function eventClass(event) {
+            return event.holidayType === "public" ? "public" : `school zone-${event.zone}`;
+        }
+
+        function eventLabel(event) {
+            return event.holidayType === "public" ? event.title : `Vacances scolaires – Zone ${event.zone}`;
+        }
+
+        function isPublicEvent(event) {
+            return event.holidayType === "public";
+        }
+
+        // Public holidays are an independent on/off switch. School zones: no selection shows all
+        // of them, otherwise only the selected ones. Neither filter affects the other.
+        function isZoneVisible(zone) {
+            return selectedFilters.size === 0 || selectedFilters.has(zone);
+        }
+
+        function isEventVisible(event) {
+            return isPublicEvent(event) ? showPublicHolidays : isZoneVisible(event.zone);
+        }
+
+        function updateFilterLegend() {
+            document.querySelectorAll("[data-filter-toggle]").forEach((button) => {
+                const key = button.dataset.filterToggle;
+                const isPublic = key === "public";
+                button.setAttribute("aria-pressed", String(isPublic ? showPublicHolidays : selectedFilters.has(key)));
+                button.classList.toggle("is-dimmed", !(isPublic ? showPublicHolidays : isZoneVisible(key)));
+            });
+        }
+
+        function toggleFilter(key) {
+            if (key === "public") {
+                showPublicHolidays = !showPublicHolidays;
+            } else if (selectedFilters.has(key)) {
+                selectedFilters.delete(key);
+            } else {
+                selectedFilters.add(key);
+            }
+            if (lastRender) {
+                renderCalendar(lastRender.nameDays, lastRender.events);
             }
         }
 
-        async function fetchYearCalendarData(year, zone) {
+        // One band per visible school zone, coloured only when that zone is on holiday that day.
+        function createZoneBands(dayEvents, className) {
+            const bands = createElement("span", className);
+            bands.setAttribute("aria-hidden", "true");
+            SCHOOL_ZONES.filter(isZoneVisible).forEach((zone) => {
+                const active = dayEvents.some((event) => !isPublicEvent(event) && event.zone === zone);
+                bands.appendChild(createElement("span", `cal-zone zone-${zone}${active ? " on" : ""}`));
+            });
+            return bands;
+        }
+
+        function formatEventDates(event) {
+            const end = event.end || event.start;
+            return end === event.start
+                ? formatShortDate(event.start)
+                : `du ${formatShortDate(event.start)} au ${formatShortDate(end)}`;
+        }
+
+        function dedupeEvents(events) {
+            const seen = new Set();
+            return events.filter((event) => {
+                const key = [event.title, event.start, event.end || event.start, event.holidayType].join("|");
+                if (seen.has(key)) {
+                    return false;
+                }
+                seen.add(key);
+                return true;
+            });
+        }
+
+        // Monday-to-Sunday grid covering the whole month, as Google Calendar does.
+        function getVisibleRange() {
+            const range = getCalendarRange();
+            if (calendarView !== "month") {
+                return range;
+            }
+            const start = new Date(range.start);
+            start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+            const end = new Date(range.end);
+            end.setDate(end.getDate() + ((7 - end.getDay()) % 7));
+            return { start, end };
+        }
+
+        function buildCalendarData(nameDays, events, range) {
+            const namesByDate = new Map(nameDays.map((entry) => [entry.date, entry.name]));
+            const eventsByDate = new Map();
+            const rangeStartKey = formatDateKey(range.start);
+            const rangeEndKey = formatDateKey(range.end);
+            events.forEach((event) => {
+                const eventEnd = event.end || event.start;
+                if (eventEnd < rangeStartKey || event.start > rangeEndKey) {
+                    return;
+                }
+                const first = parseDateKey(event.start < rangeStartKey ? rangeStartKey : event.start);
+                const lastKey = eventEnd > rangeEndKey ? rangeEndKey : eventEnd;
+                for (let day = first; formatDateKey(day) <= lastKey; day.setDate(day.getDate() + 1)) {
+                    const dayKey = formatDateKey(day);
+                    if (!eventsByDate.has(dayKey)) {
+                        eventsByDate.set(dayKey, []);
+                    }
+                    eventsByDate.get(dayKey).push(event);
+                }
+            });
+            return { namesByDate, eventsByDate, events };
+        }
+
+        // The name-day source sometimes repeats a holiday title; hide it to avoid showing it twice.
+        function getSaint(dayKey) {
+            const saint = (calendarData.namesByDate.get(dayKey) || "").trim();
+            const normalized = saint.toLocaleLowerCase("fr-FR");
+            const duplicatesEvent = (calendarData.eventsByDate.get(dayKey) || []).some(
+                (event) => event.title.trim().toLocaleLowerCase("fr-FR") === normalized
+            );
+            return duplicatesEvent ? "" : saint;
+        }
+
+        function describeDay(day, dayKey) {
+            const saint = getSaint(dayKey);
+            const dayEvents = calendarData.eventsByDate.get(dayKey) || [];
+            return [formatLongDate(day), saint, ...dayEvents.map(eventLabel)]
+                .filter(Boolean)
+                .join(", ");
+        }
+
+        function dayStateClasses(day, dayKey) {
+            const classes = [];
+            if (dayKey === formatDateKey(new Date())) {
+                classes.push("today");
+            }
+            if (day.getDay() === 0 || day.getDay() === 6) {
+                classes.push("weekend");
+            }
+            return classes;
+        }
+
+        function renderWeekdayHeader() {
+            const header = createElement("div", "cal-weekdays");
+            header.setAttribute("aria-hidden", "true");
+            header.appendChild(createElement("span", "cal-weeknum-head", "S"));
+            for (let index = 0; index < 7; index += 1) {
+                const weekday = new Date(2024, 0, 1 + index, 12);
+                header.appendChild(createElement(
+                    "span",
+                    "",
+                    weekday.toLocaleDateString("fr-FR", { weekday: "short" })
+                ));
+            }
+            return header;
+        }
+
+        function renderMonthView(range) {
+            const monthIndex = getCalendarRange().start.getMonth();
+            const wrapper = createElement("div", "cal-month");
+            const grid = createElement("div", "cal-month-grid");
+            for (let day = new Date(range.start); day <= range.end; day.setDate(day.getDate() + 1)) {
+                const dayKey = formatDateKey(day);
+                if (day.getDay() === 1) {
+                    grid.appendChild(createWeekNumber("cal-weeknum", day));
+                }
+                const cell = createElement("button", "cal-cell");
+                cell.type = "button";
+                cell.dataset.date = dayKey;
+                cell.classList.add(...dayStateClasses(day, dayKey));
+                if (day.getMonth() !== monthIndex) {
+                    cell.classList.add("outside");
+                }
+                if (dayKey === formatDateKey(new Date())) {
+                    cell.setAttribute("aria-current", "date");
+                }
+                cell.setAttribute("aria-label", describeDay(day, dayKey));
+
+                const top = createElement("span", "cal-cell-top");
+                top.appendChild(createElement("span", "cal-date", String(day.getDate())));
+                if (day.getDate() === 1) {
+                    top.appendChild(createElement(
+                        "span",
+                        "cal-month-label",
+                        day.toLocaleDateString("fr-FR", { month: "short" })
+                    ));
+                }
+                const saint = getSaint(dayKey);
+                if (saint) {
+                    top.appendChild(createElement("span", "cal-saint", saint));
+                }
+                cell.appendChild(top);
+
+                const dayEvents = calendarData.eventsByDate.get(dayKey) || [];
+                const publicEvents = dayEvents.filter(isPublicEvent);
+                if (publicEvents.length > 0) {
+                    const chips = createElement("span", "cal-chips");
+                    publicEvents.slice(0, MAX_MONTH_CHIPS).forEach((event) => {
+                        chips.appendChild(createElement("span", `cal-chip ${eventClass(event)}`, event.title));
+                    });
+                    if (publicEvents.length > MAX_MONTH_CHIPS) {
+                        chips.appendChild(createElement(
+                            "span",
+                            "cal-more",
+                            `+${publicEvents.length - MAX_MONTH_CHIPS} autres`
+                        ));
+                    }
+                    const dots = createElement("span", "cal-dots");
+                    publicEvents.slice(0, MAX_MONTH_CHIPS).forEach((event) => {
+                        dots.appendChild(createElement("span", `cal-dot ${eventClass(event)}`));
+                    });
+                    cell.append(chips, dots);
+                }
+                cell.appendChild(createZoneBands(dayEvents, "cal-zones"));
+                grid.appendChild(cell);
+            }
+            wrapper.append(renderWeekdayHeader(), grid);
+            return wrapper;
+        }
+
+        function renderWeekView(range) {
+            const week = createElement("div", "cal-week");
+            for (let day = new Date(range.start); day <= range.end; day.setDate(day.getDate() + 1)) {
+                const dayKey = formatDateKey(day);
+                const column = createElement("div", "cal-week-day");
+                column.classList.add(...dayStateClasses(day, dayKey));
+                if (dayKey === formatDateKey(new Date())) {
+                    column.setAttribute("aria-current", "date");
+                }
+
+                const head = createElement("time", "cal-week-head");
+                head.dateTime = dayKey;
+                const dayName = createElement(
+                    "span",
+                    "cal-week-dayname",
+                    day.toLocaleDateString("fr-FR", { weekday: "short" })
+                );
+                dayName.setAttribute("aria-hidden", "true");
+                const dayNumber = createElement("span", "cal-date", String(day.getDate()));
+                dayNumber.setAttribute("aria-hidden", "true");
+                head.append(dayName, dayNumber, createElement("span", "visually-hidden", formatLongDate(day)));
+
+                const body = createElement("div", "cal-week-body");
+                body.appendChild(createElement("div", "cal-saint", getSaint(dayKey)));
+                const allDay = createElement("div", "cal-allday");
+                allDay.setAttribute("role", "group");
+                allDay.setAttribute("aria-label", "Toute la journée");
+                (calendarData.eventsByDate.get(dayKey) || []).filter(isPublicEvent).forEach((event) => {
+                    allDay.appendChild(createElement("span", `cal-chip ${eventClass(event)}`, event.title));
+                });
+                body.appendChild(allDay);
+                body.appendChild(createZoneBands(calendarData.eventsByDate.get(dayKey) || [], "cal-zones"));
+
+                column.append(head, body);
+                week.appendChild(column);
+            }
+            return week;
+        }
+
+        function renderMiniMonth(monthStart) {
+            const month = createElement("section", "cal-mini");
+            const title = createElement(
+                "button",
+                "cal-mini-title",
+                monthStart.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
+            );
+            title.type = "button";
+            title.dataset.monthJump = formatDateKey(monthStart);
+            title.setAttribute("aria-label", `Ouvrir ${title.textContent} en vue mois`);
+            month.appendChild(title);
+
+            const days = createElement("div", "cal-mini-days");
+            const headSpan = createElement("span", "cal-mini-wd", "S");
+            headSpan.setAttribute("aria-hidden", "true");
+            days.appendChild(headSpan);
+            for (let index = 0; index < 7; index += 1) {
+                const weekday = new Date(2024, 0, 1 + index, 12);
+                const label = createElement(
+                    "span",
+                    "cal-mini-wd",
+                    weekday.toLocaleDateString("fr-FR", { weekday: "narrow" }).toLocaleUpperCase("fr-FR")
+                );
+                label.setAttribute("aria-hidden", "true");
+                days.appendChild(label);
+            }
+            const leadingBlanks = (monthStart.getDay() + 6) % 7;
+            if (leadingBlanks > 0) {
+                days.appendChild(createWeekNumber("cal-mini-weeknum", monthStart));
+            }
+            for (let blank = leadingBlanks; blank > 0; blank -= 1) {
+                days.appendChild(createElement("span"));
+            }
+            for (
+                let day = new Date(monthStart);
+                day.getMonth() === monthStart.getMonth();
+                day.setDate(day.getDate() + 1)
+            ) {
+                const dayKey = formatDateKey(day);
+                if (day.getDay() === 1) {
+                    days.appendChild(createWeekNumber("cal-mini-weeknum", day));
+                }
+                const dayEvents = calendarData.eventsByDate.get(dayKey) || [];
+                const button = createElement("button", "cal-mini-day", String(day.getDate()));
+                button.type = "button";
+                button.dataset.date = dayKey;
+                button.classList.add(...dayStateClasses(day, dayKey));
+                if (dayEvents.some(isPublicEvent)) {
+                    button.classList.add("has-public");
+                }
+                if (dayEvents.some((event) => !isPublicEvent(event))) {
+                    button.appendChild(createZoneBands(dayEvents, "cal-mini-zones"));
+                }
+                if (dayKey === formatDateKey(new Date())) {
+                    button.setAttribute("aria-current", "date");
+                }
+                button.setAttribute("aria-label", describeDay(day, dayKey));
+                days.appendChild(button);
+            }
+            month.appendChild(days);
+            return month;
+        }
+
+        function renderMiniMonths(range) {
+            const grid = createElement("div", "cal-mini-grid");
+            for (
+                let month = new Date(range.start.getFullYear(), range.start.getMonth(), 1, 12);
+                month <= range.end;
+                month.setMonth(month.getMonth() + 1)
+            ) {
+                grid.appendChild(renderMiniMonth(month));
+            }
+            return grid;
+        }
+
+        function renderPeriodEvents(range) {
+            periodEvents.innerHTML = "";
+            const startKey = formatDateKey(range.start);
+            const endKey = formatDateKey(range.end);
+            const visible = calendarData.events
+                .filter((event) => (event.end || event.start) >= startKey && event.start <= endKey)
+                .sort((first, second) => first.start.localeCompare(second.start));
+            periodEvents.hidden = calendarView === "week" || calendarView === "month" || visible.length === 0;
+            if (periodEvents.hidden) {
+                return;
+            }
+            periodEvents.appendChild(createElement("h3", "cal-period-title", "Événements de la période"));
+            const list = createElement("ul", "cal-period-list");
+            visible.forEach((event) => {
+                const item = createElement("li");
+                item.append(
+                    createElement("span", `cal-chip ${eventClass(event)}`, eventLabel(event)),
+                    createElement("span", "cal-period-dates", formatEventDates(event))
+                );
+                list.appendChild(item);
+            });
+            periodEvents.appendChild(list);
+        }
+
+        function renderDayDetail() {
+            dayDetail.innerHTML = "";
+            dayDetail.hidden = calendarView === "week";
+            if (dayDetail.hidden) {
+                return;
+            }
+            const day = parseDateKey(selectedDateKey);
+            dayDetail.appendChild(createElement("h3", "cal-detail-title", formatLongDate(day)));
+            const saint = getSaint(selectedDateKey);
+            dayDetail.appendChild(createElement(
+                "p",
+                "cal-detail-saint",
+                saint ? `Saint du jour : ${saint}` : "Saint du jour indisponible"
+            ));
+            const dayEvents = calendarData.eventsByDate.get(selectedDateKey) || [];
+            if (dayEvents.length === 0) {
+                dayDetail.appendChild(createElement("p", "mb-0", "Aucun jour férié ni vacances scolaires."));
+                return;
+            }
+            const list = createElement("ul", "cal-detail-list");
+            dayEvents.forEach((event) => {
+                const item = createElement("li");
+                item.append(
+                    createElement("span", `cal-chip ${eventClass(event)}`, eventLabel(event)),
+                    createElement("span", "cal-period-dates", formatEventDates(event))
+                );
+                list.appendChild(item);
+            });
+            dayDetail.appendChild(list);
+        }
+
+        function ensureSelectedDate() {
+            const range = getCalendarRange();
+            const startKey = formatDateKey(range.start);
+            const endKey = formatDateKey(range.end);
+            if (selectedDateKey && selectedDateKey >= startKey && selectedDateKey <= endKey) {
+                return;
+            }
+            const todayKey = formatDateKey(new Date());
+            selectedDateKey = todayKey >= startKey && todayKey <= endKey ? todayKey : startKey;
+        }
+
+        function selectDate(dateKey) {
+            selectedDateKey = dateKey;
+            calendarDays.querySelectorAll("[data-date]").forEach((node) => {
+                const selected = node.dataset.date === dateKey;
+                node.classList.toggle("selected", selected);
+                node.setAttribute("aria-pressed", String(selected));
+            });
+            renderDayDetail();
+        }
+
+        function renderCalendar(nameDays, events) {
+            lastRender = { nameDays, events };
+            const range = getCalendarRange();
+            const visibleRange = getVisibleRange();
+            const shownEvents = events.filter(isEventVisible);
+            calendarData = buildCalendarData(nameDays, shownEvents, visibleRange);
+            updateFilterLegend();
+            calendarDays.innerHTML = "";
+            calendarDays.dataset.view = calendarView;
+            updateCalendarTitle(range);
+            updateCalendarControls();
+
+            if (calendarView === "week") {
+                calendarDays.appendChild(renderWeekView(visibleRange));
+            } else if (calendarView === "month") {
+                calendarDays.appendChild(renderMonthView(visibleRange));
+            } else {
+                calendarDays.appendChild(renderMiniMonths(visibleRange));
+            }
+            ensureSelectedDate();
+            selectDate(selectedDateKey);
+            renderPeriodEvents(visibleRange);
+        }
+
+        async function fetchYearCalendarData(year) {
             const requests = [
                 fetchJson(`/api/holidays/france/${year}`),
                 fetchJson(`/api/name-days/france/${year}`)
             ];
-            if (year === 2025 || year === 2026) {
-                requests.push(fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`));
+            if (SCHOOL_YEARS.includes(year)) {
+                SCHOOL_ZONES.forEach((zone) => {
+                    requests.push(fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`));
+                });
             }
             return Promise.allSettled(requests);
         }
@@ -620,10 +963,9 @@
         async function refreshCalendarData() {
             const requestVersion = ++dataRequestVersion;
             hideError();
-            const zone = zoneSelect.value;
-            const years = getRangeYears(getCalendarRange());
+            const years = getRangeYears(getVisibleRange());
             const yearResults = await Promise.all(
-                years.map((year) => fetchYearCalendarData(year, zone))
+                years.map((year) => fetchYearCalendarData(year))
             );
             if (requestVersion !== dataRequestVersion) {
                 return;
@@ -634,7 +976,7 @@
             const errors = [];
             yearResults.forEach((results, index) => {
                 const year = years[index];
-                const [publicResult, nameDaysResult, schoolResult] = results;
+                const [publicResult, nameDaysResult, ...schoolResults] = results;
                 if (publicResult.status === "fulfilled") {
                     events.push(...publicResult.value);
                 } else {
@@ -645,15 +987,19 @@
                 } else {
                     errors.push(`Saints ${year} : ${nameDaysResult.reason.message || "données indisponibles"}.`);
                 }
-                if (schoolResult && schoolResult.status === "fulfilled") {
-                    events.push(...schoolResult.value);
-                } else if (schoolResult && schoolResult.status === "rejected") {
-                    errors.push(`Vacances scolaires ${year} : ${schoolResult.reason.message || "données indisponibles"}.`);
-                }
+                schoolResults.forEach((schoolResult) => {
+                    if (schoolResult.status === "fulfilled") {
+                        events.push(...schoolResult.value);
+                    } else {
+                        errors.push(`Vacances scolaires ${year} : ${schoolResult.reason.message || "données indisponibles"}.`);
+                    }
+                });
             });
 
-            renderDailyCalendar(nameDays, events);
-            updateJsonLd(events);
+            const uniqueEvents = dedupeEvents(events);
+            renderCalendar(nameDays, uniqueEvents);
+            updateNextHoliday(uniqueEvents);
+            updateJsonLd(uniqueEvents);
             if (errors.length > 0) {
                 showError(errors.join(" "));
             } else {
@@ -661,102 +1007,56 @@
             }
         }
 
-        function trackRevenueEvent(eventPayload) {
-            const payload = {
-                pageType: PAGE_TYPE,
-                ...eventPayload
-            };
-
-            const body = JSON.stringify(payload);
-            if (navigator.sendBeacon) {
-                const blob = new Blob([body], { type: "application/json" });
-                navigator.sendBeacon("/api/metrics/revenue", blob);
-                return;
-            }
-
-            fetch("/api/metrics/revenue", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body,
-                keepalive: true
-            }).catch((error) => {
-                console.warn("Revenue tracking failed", error);
-            });
-        }
-
-        function initAds() {
-            const adSlots = document.querySelectorAll(".adsbygoogle");
-            adSlots.forEach((slot) => {
-                if (slot.dataset.adsInitialized === "1") {
-                    return;
-                }
-
-                try {
-                    (window.adsbygoogle = window.adsbygoogle || []).push({});
-                    slot.dataset.adsInitialized = "1";
-                    trackRevenueEvent({
-                        eventType: "ad_init",
-                        slot: slot.dataset.slotName || "unknown",
-                        status: "success"
-                    });
-                } catch (error) {
-                    slot.dataset.adsInitialized = "0";
-                    const container = slot.closest(".ad-slot");
-                    if (container) {
-                        container.classList.add("ad-slot-fallback");
-                    }
-                    trackRevenueEvent({
-                        eventType: "ad_init",
-                        slot: slot.dataset.slotName || "unknown",
-                        status: "failed"
-                    });
-                }
-            });
-        }
-
         function changeCalendarView(view) {
             calendarView = view;
             if (view === "year") {
-                activeDate = new Date(Number(yearSelect.value), 0, 1, 12);
+                activeDate = new Date(activeDate.getFullYear(), 0, 1, 12);
             } else if (view === "semester") {
                 const startMonth = activeDate.getMonth() < 6 ? 0 : 6;
-                activeDate = new Date(Number(yearSelect.value), startMonth, 1, 12);
+                activeDate = new Date(activeDate.getFullYear(), startMonth, 1, 12);
             }
             refreshCalendarData();
         }
 
         function navigateCalendar(direction) {
             shiftDate(activeDate, direction);
-            yearSelect.value = String(activeDate.getFullYear());
-            refreshCalendarData();
-        }
-
-        function selectCalendarYear() {
-            const year = Number(yearSelect.value);
-            const month = calendarView === "year" ? 0 : activeDate.getMonth();
-            const day = calendarView === "year" ? 1 : Math.min(
-                activeDate.getDate(),
-                new Date(year, month + 1, 0).getDate()
-            );
-            activeDate = new Date(year, month, day, 12);
-            if (calendarView === "semester") {
-                activeDate = new Date(year, month < 6 ? 0 : 6, 1, 12);
-            }
             refreshCalendarData();
         }
 
         function initializePage() {
-            trackRevenueEvent({ eventType: "page_view", status: "viewed" });
-            populateYearDropdown();
-            activeDate = new Date(Number(yearSelect.value), new Date().getMonth(), new Date().getDate(), 12);
+            activeDate = new Date();
+            if (activeDate.getFullYear() < FIRST_YEAR) {
+                activeDate = new Date(FIRST_YEAR, 0, 1, 12);
+            } else if (activeDate.getFullYear() > LAST_YEAR) {
+                activeDate = new Date(LAST_YEAR, 11, 31, 12);
+            }
             calendarViewButtons.forEach((button) => {
                 button.addEventListener("click", () => changeCalendarView(button.dataset.calendarView));
             });
             previousPeriodButton.addEventListener("click", () => navigateCalendar(-1));
+            document.querySelectorAll("[data-filter-toggle]").forEach((button) => {
+                button.addEventListener("click", () => toggleFilter(button.dataset.filterToggle));
+            });
             nextPeriodButton.addEventListener("click", () => navigateCalendar(1));
+            bannerPrevButton.addEventListener("click", () => shiftYear(-1));
+            bannerNextButton.addEventListener("click", () => shiftYear(1));
+            calendarDays.addEventListener("click", (clickEvent) => {
+                const monthJump = clickEvent.target.closest("[data-month-jump]");
+                if (monthJump) {
+                    const target = parseDateKey(monthJump.dataset.monthJump);
+                    calendarView = "month";
+                    activeDate = target;
+                    selectedDateKey = null;
+                    refreshCalendarData();
+                    return;
+                }
+                const dayNode = clickEvent.target.closest("[data-date]");
+                if (dayNode) {
+                    selectDate(dayNode.dataset.date);
+                }
+            });
             document.getElementById("today-period").addEventListener("click", () => {
                 const today = new Date();
-                yearSelect.value = String(today.getFullYear());
                 activeDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12);
                 if (calendarView === "year") {
                     activeDate = new Date(today.getFullYear(), 0, 1, 12);
@@ -770,11 +1070,7 @@
                 }
                 refreshCalendarData();
             });
-            initAds();
             refreshCalendarData();
-
-            yearSelect.addEventListener("change", selectCalendarYear);
-            zoneSelect.addEventListener("change", refreshCalendarData);
         }
 
         if (document.readyState === "loading") {
@@ -783,5 +1079,4 @@
             initializePage();
         }
     </script>
-</body>
-</html>
+{% endblock %}
