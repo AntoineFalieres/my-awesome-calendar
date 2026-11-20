@@ -7,7 +7,8 @@ A comprehensive, interactive holiday and school calendar application that displa
 - 🌍 **200+ Countries Supported** - View public holidays for countries worldwide
 - 🗺️ **Regional Subdivisions** - Select state/province/regional holidays (US states, Canadian provinces, German Bundesländer, etc.)
 - 🏫 **French School Holidays** - Dedicated support for French school holidays by zone (A, B, C)
-- 📅 **Flexible Views** - Switch between Month and Week calendar views
+- ✨ **French Name Days** - Display the French saint/name day alongside every date
+- 📅 **Flexible Views** - Switch between Week, Month, Semester, and Year calendar views
 - 🌞 **Monday Start** - Calendar weeks start on Monday
 - ⚡ **Real-time Updates** - Dynamically load holidays based on country/region/year selection
 - 📱 **Responsive Design** - Works on desktop and mobile devices
@@ -52,21 +53,22 @@ A comprehensive, interactive holiday and school calendar application that displa
    - **Canada**: Select a province (ON, QC, BC, etc.)
    - **Other countries**: Select your region to filter holidays
 4. **View Calendar** - Holidays appear marked on the calendar
-5. **Switch Views** - Use Month/Week buttons in the toolbar
+5. **Switch Views** - Use Week, Month, Semester, or Year buttons in the calendar toolbar
 
 ### Calendar Features
 
-- **Month View**: Overview of all holidays in a month
-- **Week View**: Detailed daily breakdown of the week
+- **Week, Month, Semester, and Year Views**: Daily rows show the weekday, date, and French name day in each range
+- **Holiday Labels**: Public holidays and available school-holiday periods appear alongside their dates
 - **Navigation**: Use Previous/Next buttons to move between periods
-- **Today Button**: Jump back to current month/week
+- **Today Button**: Jump back to the current period
 
 ## 🔧 Technology Stack
 
 - **Backend**: Flask (Python web framework)
-- **Frontend**: FullCalendar.js v6.1.15
+- **Frontend**: Custom responsive calendar controls with vanilla JavaScript
 - **Styling**: Bootstrap 5.3.3
 - **Holiday Data**: Python `holidays` library (200+ countries)
+- **French Name Days**: [Abalin Name Day API calendar data](https://github.com/xnekv03/nameday-api)
 - **Database**: None (stateless, data-driven)
 
 ## 📚 API Documentation
