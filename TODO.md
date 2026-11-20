@@ -68,4 +68,6 @@
 - [ ] **PM:** review scope and roadmap impact from merged PR #16. <!-- AUTO-PR:16;ROLE:PM -->
 - [ ] **SEO:** review metadata/indexability implications from merged PR #16. <!-- AUTO-PR:16;ROLE:SEO -->
 - [ ] **UX/UI:** review readability and interaction impact from merged PR #16. <!-- AUTO-PR:16;ROLE:UX/UI -->
+- [ ] **UX/UI:** review readability and interaction impact from merged PR #18. <!-- AUTO-PR:18;ROLE:UX/UI -->
+- [ ] **Full-Stack:** validate implementation consistency from merged PR #18. <!-- AUTO-PR:18;ROLE:Full-Stack -->
 <!-- AUTO-TODO-UPDATES:END -->
