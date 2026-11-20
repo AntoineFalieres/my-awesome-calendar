@@ -5,6 +5,7 @@
 <!-- AUTO-CHANGELOG-UPDATES:START -->
 ### Merged PR entries
 
+- 2026-10-26 - PR #12: feat(legal): add compliance reviewer and consent policy (Roles: PM, UX/UI, Full-Stack, Ad Ops) https://github.com/AntoineFalieres/my-awesome-calendar/pull/12 <!-- AUTO-PR:12 -->
 - 2026-10-26 - PR #9: feat: add Code Quality Challenger engineer agent (Roles: PM, SEO, UX/UI, Full-Stack, Ad Ops) https://github.com/AntoineFalieres/my-awesome-calendar/pull/9 <!-- AUTO-PR:9 -->
 
 - 2026-07-07 - PR #7: feat(agentic): automate roadmap/todo/changelog updates from merged PRs (Roles: PM, SEO, UX/UI, Full-Stack, Ad Ops) https://github.com/AntoineFalieres/my-awesome-calendar/pull/7 <!-- AUTO-PR:7 -->

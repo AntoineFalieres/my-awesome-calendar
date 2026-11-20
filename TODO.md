@@ -60,4 +60,8 @@
 - [ ] **UX/UI:** review readability and interaction impact from merged PR #9. <!-- AUTO-PR:9;ROLE:UX/UI -->
 - [ ] **Full-Stack:** validate implementation consistency from merged PR #9. <!-- AUTO-PR:9;ROLE:Full-Stack -->
 - [ ] **Ad Ops:** review monetization/compliance implications from merged PR #9. <!-- AUTO-PR:9;ROLE:Ad Ops -->
+- [ ] **PM:** review scope and roadmap impact from merged PR #12. <!-- AUTO-PR:12;ROLE:PM -->
+- [ ] **UX/UI:** review readability and interaction impact from merged PR #12. <!-- AUTO-PR:12;ROLE:UX/UI -->
+- [ ] **Full-Stack:** validate implementation consistency from merged PR #12. <!-- AUTO-PR:12;ROLE:Full-Stack -->
+- [ ] **Ad Ops:** review monetization/compliance implications from merged PR #12. <!-- AUTO-PR:12;ROLE:Ad Ops -->
 <!-- AUTO-TODO-UPDATES:END -->
