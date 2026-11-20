@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ page_description }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ page_description }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ page_title }}">
+    <meta name="twitter:description" content="{{ page_description }}">
+    {% if cmp_script_url %}
+    <script async src="{{ cmp_script_url }}"></script>
+    {% endif %}
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <link href="{{ url_for('static', filename='site.css') }}" rel="stylesheet">
+    {% block head_extra %}{% endblock %}
+    {% block jsonld %}{% endblock %}
+</head>
+<body
+    data-page-type="{{ page_type }}"
+    data-ads-enabled="{{ '1' if ad_config.enabled else '0' }}"
+    data-ads-client="{{ ad_config.client_id }}"
+    data-cmp-enabled="{{ '1' if cmp_script_url else '0' }}"
+>
+    <a class="skip-link" href="#main-content">Aller au contenu</a>
+    <header class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand mb-0 h1" href="/">{{ site_name }}</a>
+            <nav class="site-nav d-flex gap-3" aria-label="Navigation principale">
+                <a href="/">Calendrier</a>
+                <a href="/france/{{ france_year }}">France {{ france_year }}</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="container {% block main_class %}py-4 py-md-5{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer py-3 border-top bg-white">
+        <div class="container d-flex flex-wrap justify-content-center gap-3">
+            <a href="/france/{{ france_year }}">Pages France {{ france_year }}</a>
+            <a href="/mentions-legales">Mentions légales</a>
+            <a href="/privacy-policy">Politique de confidentialité</a>
+            {% if cmp_script_url %}
+            <button type="button" class="btn btn-link p-0 align-baseline" data-open-consent>Gérer les cookies</button>
+            {% endif %}
+        </div>
+    </footer>
+
+    {% block scripts_before %}{% endblock %}
+    <script src="{{ url_for('static', filename='site.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

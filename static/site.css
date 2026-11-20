@@ -1,0 +1,87 @@
+.skip-link {
+    background: #212529;
+    color: #ffffff;
+    left: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    position: absolute;
+    top: -4rem;
+    z-index: 1100;
+}
+
+.skip-link:focus {
+    top: 0.5rem;
+}
+
+.site-nav a {
+    color: #dee2e6;
+    text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.site-footer a,
+.site-footer .btn-link {
+    text-decoration: none;
+}
+
+.date-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.date-list > li + li {
+    border-top: 1px solid #edf0f5;
+}
+
+.date-list > li {
+    padding: 0.5rem 0;
+}
+
+.date-list .date-weekday {
+    text-transform: capitalize;
+}
+
+/* Ad slots stay hidden until consent allows an ad request, so nothing is reserved for ads that never load. */
+.ad-slot {
+    margin: 1.5rem 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.ad-slot[hidden] {
+    display: none;
+}
+
+.ad-slot-label {
+    color: #565e64;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.25rem;
+    text-transform: uppercase;
+}
+
+.ad-slot .adsbygoogle {
+    display: block;
+    width: 100%;
+}
+
+.ad-slot-inline,
+.ad-slot-footer {
+    min-height: 280px;
+}
+
+.ad-slot:has(.adsbygoogle[data-ad-status="unfilled"]) {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .ad-slot-inline,
+    .ad-slot-footer {
+        min-height: 120px;
+    }
+}
