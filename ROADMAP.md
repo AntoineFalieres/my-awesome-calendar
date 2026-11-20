@@ -83,6 +83,7 @@
 <!-- AUTO-ROADMAP-UPDATES:START -->
 ### Next from merged PRs
 
+- 2026-10-28 - PR #14 `docs(github): add caveman commit skill` - Roles: UX/UI (https://github.com/AntoineFalieres/my-awesome-calendar/pull/14) <!-- AUTO-PR:14 -->
 - 2026-10-26 - PR #12 `feat(legal): add compliance reviewer and consent policy` - Roles: PM, UX/UI, Full-Stack, Ad Ops (https://github.com/AntoineFalieres/my-awesome-calendar/pull/12) <!-- AUTO-PR:12 -->
 - 2026-10-26 - PR #9 `feat: add Code Quality Challenger engineer agent` - Roles: PM, SEO, UX/UI, Full-Stack, Ad Ops (https://github.com/AntoineFalieres/my-awesome-calendar/pull/9) <!-- AUTO-PR:9 -->
 

@@ -64,4 +64,5 @@
 - [ ] **UX/UI:** review readability and interaction impact from merged PR #12. <!-- AUTO-PR:12;ROLE:UX/UI -->
 - [ ] **Full-Stack:** validate implementation consistency from merged PR #12. <!-- AUTO-PR:12;ROLE:Full-Stack -->
 - [ ] **Ad Ops:** review monetization/compliance implications from merged PR #12. <!-- AUTO-PR:12;ROLE:Ad Ops -->
+- [ ] **UX/UI:** review readability and interaction impact from merged PR #14. <!-- AUTO-PR:14;ROLE:UX/UI -->
 <!-- AUTO-TODO-UPDATES:END -->
