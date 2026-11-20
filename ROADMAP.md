@@ -1,82 +1,59 @@
 # ROADMAP
 
-## Step 1 - Core launch (France utility)
+## Step 1 - Public launch without ads
 
-**Goal:** ship the smallest usable France calendar.
+**Goal:** ship the smallest usable France calendar without production ads.
 
-- France-only calendar flow
-- Public holidays + school zones
-- Stable API and caching behavior
-- Baseline mobile-first UI
-
-**Done when:**
-- Year/zone selection reliably displays accurate events
-- Main calendar experience works on mobile and desktop
-
-## Step 2 - SEO and UX requirements
-
-**Goal:** make pages indexable, readable, and structured.
-
-- SEO URL strategy for France/year/holiday pages
-- Metadata and heading conventions
-- JSON-LD Event structure
-- Mobile-first layout with ad-safe placeholders
-- Legal footer links and dedicated legal/privacy pages
-- GDPR consent script placeholder wired in `<head>` for future consent manager integration
+- France national public holidays and school zones A/B/C
+- Current and next calendar years, subject to available source data
+- Mobile-first month view, with existing additional views retained
+- Stable data loading, error handling, and basic SEO
+- Production deployment with ads and optional measurement disabled
 
 **Done when:**
-- Pages are crawlable and semantically structured
-- JSON-LD is present and consistent with rendered holiday data
-- Legal and privacy pages are reachable from core pages and aligned with SEO/legal baseline
+- Available dates are verified against their sources for each year and zone;
+  missing or partial data is clearly indicated rather than presented as complete
+- Year/zone selection and month view work on mobile and desktop, including
+  loading, empty, and error states
+- Key pages are crawlable and semantically structured; JSON-LD matches rendered
+  holiday data, and legal/privacy pages are reachable
+- An ad-free production configuration starts successfully and does not
+  initialize ads or optional measurement
 
-## Step 3 - Full-stack delivery
+## Step 2 - Consent and monetization readiness
 
-**Goal:** implement prioritized PM+SEO+UX requirements.
+**Goal:** prepare production ads without compromising consent or layout.
 
-- France endpoint backed by Nager.Date
-- Calendar rendering + school holiday merge
-- JSON-LD generation
-- CLS-safe placeholders
-
-**Done when:**
-- Core routes and APIs are stable
-- UX remains readable with resilient loading/error states
-
-## Step 4 - Monetization readiness
-
-**Goal:** integrate ad stack safely.
-
-- Async AdSense loader
-- Guarded per-slot initialization
-- Layout-stable fallback behavior on no-fill/block
-- `ads.txt` served at `/ads.txt`
+- PM and legal review: confirm applicable requirements for the deployment and
+  [consent policy](CONSENT_POLICY.md)
+- SEO and UX/UI: verify legal-page metadata, links, and accessible consent controls
+- Full-Stack and Ad Ops: implement consent state handling and validate ad and
+  optional measurement behavior against the consent policy
+- Configure production AdSense IDs and `ads.txt`; preserve reserved ad space
+  and safe behavior on no-fill, blocking, or loading failure
 
 **Done when:**
-- Ad loading failures do not break UI or shift layout
-- `ads.txt` is reachable and validly formatted
+- Production ad configuration and `ads.txt` are valid
+- Required consent behavior is verified before production ad initialization
+  and optional measurement; non-consented behavior follows the policy
+- Ads do not break the UI or cause layout shifts when loading fails or is blocked
+- Legal/privacy pages, consent controls, and deployment requirements are reviewed
 
-## Step 5 - Compliance and consent hardening
+## Step 3 - Measure and expand
 
-**Goal:** make monetization legally compliant while preserving UX and performance.
+**Goal:** use observed traffic and indexing to prioritize improvements.
 
-- PM: document consent scope and acceptance criteria in [CONSENT_POLICY.md](CONSENT_POLICY.md)
-- SEO: enforce metadata/canonical/indexing policy for legal pages
-- UX/UI: design mobile-first cookie consent UX with readable copy and low friction
-- Full-Stack: integrate consent manager script and consent state handling
-- Ad Ops: enforce Consent Mode before ad initialization; block personalized ads without opt-in while allowing contextual ads per [CONSENT_POLICY.md](CONSENT_POLICY.md)
-
-**Done when:**
-- Consent state is captured before ad/measurement activation
-- Legal/privacy pages, footer links, and consent UX are consistent and production-ready
-- Revenue tracking remains available in compliant mode
+- Review search demand and indexing before expanding France landing pages or
+  considering additional countries
+- Optimize ad placements using permitted measurement after production ads launch
 
 ## Next
 
-- PM: define production rollout criteria
-- Full-Stack + Ad Ops: set production AdSense IDs and consent-gated ad initialization
-- SEO + UX/UI: refine legal/privacy page structure, metadata, and footer discoverability
-- Ad Ops: iterate ad placement by RPM/CTR data
-- PM + SEO: expand SEO landing pages before country expansion
+- Full-Stack: remove the ad/CMP configuration blocker for an ad-free production
+  deployment and verify ads and optional measurement remain disabled
+- PM + Full-Stack: verify current/next-year data coverage and public launch criteria
+- UX/UI + Full-Stack + Ad Ops: complete and verify consent and production ad gates
+- PM + SEO: evaluate landing-page expansion using observed traffic and indexing
 
 ## Auto-managed updates
 
