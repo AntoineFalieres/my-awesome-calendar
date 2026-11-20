@@ -1,6 +1,6 @@
 ---
 description: Design mobile-first, conversion-aware UX/UI that keeps holiday data instantly readable while integrating non-intrusive ad placements.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input

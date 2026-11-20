@@ -1,6 +1,6 @@
 ---
 description: Review feature proposals and implementation diffs for legal and regulatory risks in France and the EU, including RGPD/GDPR.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input

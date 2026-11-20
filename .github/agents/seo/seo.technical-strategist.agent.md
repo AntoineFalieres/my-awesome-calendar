@@ -1,6 +1,6 @@
 ---
 description: Architect technical SEO, keyword intent targeting, and structured data strategy for calendar and holiday pages.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input

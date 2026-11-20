@@ -1,6 +1,6 @@
 ---
 description: Challenge technical decisions, catch over-engineering, and ensure code quality through constructive pair-programming-style review and feedback.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input

@@ -1,6 +1,6 @@
 ---
 description: Create or update a pull request for this repository using the PR authoring workflow skill.
-tools: ['changes', 'githubRepo', 'github/github-mcp-server/pull_request_read', 'github/github-mcp-server/pull_request_write']
+tools: ['changes', 'githubRepo', 'github/github-mcp-server/pull_request_read', 'github/github-mcp-server/pull_request_write', 'read', 'search', 'execute']
 ---
 
 ## User Input
