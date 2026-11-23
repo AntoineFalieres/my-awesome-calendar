@@ -8,9 +8,27 @@
 - [x] Generate JSON-LD Event data from displayed holidays.
 - [x] Add AdSense-ready placeholder slots with CLS-safe reserved space.
 - [x] Add and serve `ads.txt`.
+- [ ] **Full-Stack (do first):** add an `ADS_ENABLED` setting (default false).
+  When false, production startup skips the ad/CMP/`ads.txt` checks, and no
+  ad, consent-manager or measurement scripts load and no `/api/metrics` calls
+  are made. Placeholder values are still rejected when ads are enabled. Cover
+  both cases with tests. This is the first step of the ad-free deployment item
+  below.
+- [ ] **Full-Stack:** resolve the PR #24 (`dev` to `main`) conflicts in
+  `app.py` and `templates/index.html` after the `ADS_ENABLED` change, and add
+  CI checks so launch changes are validated before merge.
+- [ ] **Full-Stack + PM:** disable the saint-name views by default for launch
+  behind a `NAME_DAYS_ENABLED` setting (default false); they are not a Step 1
+  requirement.
 - [ ] Verify available France public and school-holiday dates for zones A/B/C
   for the current and next calendar years against their sources; clearly
-  indicate missing or partial coverage.
+  indicate missing or partial coverage. Do not add unchecked dates: 2027 is
+  currently missing Toussaint and Noël, so mark it partial in the UI and
+  JSON-LD until verified against the official calendar.
+- [ ] **SEO:** fix the school-holiday JSON-LD label (Christmas break starting
+  2025-12-20 is shown as "Noël 2026"), keep empty or partial-year pages out of
+  the sitemap or `noindex`, and add a test comparing rendered dates with
+  JSON-LD for every sitemap URL.
 - [ ] Verify month view, year/zone selection, and loading, empty, and error
   states on mobile and desktop. Existing week, semester, and year views remain
   available but are not launch blockers.
