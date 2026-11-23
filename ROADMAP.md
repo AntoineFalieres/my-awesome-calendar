@@ -49,9 +49,15 @@
 
 ## Next
 
-- Full-Stack: remove the ad/CMP configuration blocker for an ad-free production
-  deployment and verify ads and optional measurement remain disabled
-- PM + Full-Stack: verify current/next-year data coverage and public launch criteria
+- Full-Stack: add an `ADS_ENABLED` setting (default off) to remove the ad/CMP
+  configuration blocker for an ad-free production deployment and verify ads and
+  optional measurement remain disabled
+- Full-Stack: resolve PR #24 conflicts and add CI before launch merges
+- PM + Full-Stack: verify current/next-year data coverage and public launch
+  criteria; mark 2027 as partial until verified, and disable saint-name views
+  for launch
+- SEO: fix school-holiday JSON-LD labels, keep empty or partial pages out of
+  the index, and test JSON-LD against rendered data
 - UX/UI + Full-Stack + Ad Ops: complete and verify consent and production ad gates
 - PM + SEO: evaluate landing-page expansion using observed traffic and indexing
 
