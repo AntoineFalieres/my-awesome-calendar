@@ -1,6 +1,6 @@
 ---
 description: Implement fast, SEO-friendly full-stack delivery with reliable data integrations, caching, and maintainable architecture.
-tools: ['changes']
+tools: ['changes', 'read', 'search', 'edit', 'execute']
 ---
 
 ## User Input

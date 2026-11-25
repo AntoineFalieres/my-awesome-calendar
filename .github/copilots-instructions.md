@@ -156,15 +156,12 @@ Local skills live under `.github/skills/**`.
   proceed; do not silently bypass the process.
 
 ### Commit message guidelines
-- Use the live skill at
-  `.github/skills/github/commit-message-guidelines/SKILL.md` for commit
-  message work.
+- Use the live skill at `.github/skills/github/caveman-commit/SKILL.md` for
+  commit message work.
 - **Mandatory trigger**: when the user asks to write/suggest/fix a commit
-  message, load and follow `commit-message-guidelines` before drafting.
+  message, load and follow `caveman-commit` before drafting.
 - Review `git diff --staged` before drafting the message.
-- Draft commit messages locally and use
-  `.github/skills/github/commit-message-guidelines/scripts/suggest_commit_message.py`
-  to bootstrap them.
+- Draft commit messages locally using the skill's rules.
 - Use the conventional commit format `<type>(<scope>): <description>` with an
   imperative summary.
 - Use the GitHub MCP only for GitHub-side repository actions, not for plain
@@ -175,8 +172,8 @@ Local skills live under `.github/skills/**`.
   not guess a message.
 - Never draft a commit message before reviewing `git diff --staged` and applying
   the skill's type/scope rules.
-- If the skill or its scripts are unavailable, stop and ask the user how to
-  proceed; do not silently bypass the process.
+- If the skill is unavailable, stop and ask the user how to proceed; do not
+  silently bypass the process.
 
 ### Roadmap/TODO/Changelog auto-updater
 - Use the local skill at

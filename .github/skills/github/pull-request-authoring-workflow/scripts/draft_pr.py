@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -9,7 +8,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
 PR_TEMPLATE_PATH = REPO_ROOT / ".github" / "pull_request_template.md"
-TICKET_ID_PATTERN = re.compile(r"[A-Z][A-Z0-9]+-\d+")
 
 
 def run_git_command(*args: str) -> str:
@@ -25,13 +23,6 @@ def run_git_command(*args: str) -> str:
 
 def get_branch_name() -> str:
     return run_git_command("rev-parse", "--abbrev-ref", "HEAD")
-
-
-def extract_ticket_id(branch_name: str) -> str | None:
-    match = TICKET_ID_PATTERN.search(branch_name)
-    if match is None:
-        return None
-    return match.group(0)
 
 
 def get_changed_files() -> list[str]:
@@ -84,11 +75,8 @@ def summarize_scope(changed_files: list[str]) -> str:
     return first_path.stem.replace("_", "-")
 
 
-def build_title(change_type: str, ticket_id: str | None, summary: str, scope: str) -> str:
-    normalized_summary = summary.strip()
-    if ticket_id:
-        return f"{change_type}({ticket_id}): {normalized_summary}"
-    return f"{change_type}({scope}): {normalized_summary}"
+def build_title(change_type: str, summary: str, scope: str) -> str:
+    return f"{change_type}({scope}): {summary.strip()}"
 
 
 def build_changes_made(changed_files: list[str]) -> str:
@@ -108,11 +96,11 @@ def build_description(change_type: str, branch_name: str, summary: str) -> str:
     )
 
 
-def render_body(template: str, description: str, breaking_changes: str, changes_made: str, related_issue: str) -> str:
+def render_body(template: str, description: str, breaking_changes: str, changes_made: str) -> str:
     replacements = {
         "[Provide a brief description of what this PR achieves. Explain the problem it solves or the feature it adds.]": description,
         "[Fill this section only when the PR impacts a column schema: column removal, column creation, column addition, or column type change. Otherwise leave `No breaking changes`.]": breaking_changes,
-        "[List the specific changes you've made in this PR. Be detailed, especially if your PR includes multiple changes.]": f"{changes_made}\n\nRelated issue: {related_issue}",
+        "[List the specific changes you've made in this PR. Be detailed, especially if your PR includes multiple changes.]": changes_made,
     }
 
     rendered = template
@@ -141,11 +129,6 @@ def parse_args() -> argparse.Namespace:
         help="Breaking changes text for the PR template.",
     )
     parser.add_argument(
-        "--related-issue",
-        default="Add ticket link here",
-        help="Ticket or issue reference to place in the PR body.",
-    )
-    parser.add_argument(
         "--output",
         help="Optional path for the rendered PR body file.",
     )
@@ -161,7 +144,6 @@ def main() -> int:
 
     try:
         branch_name = get_branch_name()
-        ticket_id = extract_ticket_id(branch_name)
         changed_files = get_changed_files()
     except subprocess.CalledProcessError as error:
         print(error.stderr.strip(), file=sys.stderr)
@@ -169,14 +151,13 @@ def main() -> int:
 
     change_type = args.change_type or infer_change_type(changed_files)
     scope = summarize_scope(changed_files)
-    title = build_title(change_type, ticket_id, args.summary, scope)
+    title = build_title(change_type, args.summary, scope)
     template = PR_TEMPLATE_PATH.read_text()
     body = render_body(
         template=template,
         description=build_description(change_type, branch_name, args.summary),
         breaking_changes=args.breaking_changes,
         changes_made=build_changes_made(changed_files),
-        related_issue=args.related_issue,
     )
 
     print("Suggested title:")

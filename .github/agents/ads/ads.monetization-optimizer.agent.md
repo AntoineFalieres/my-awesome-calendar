@@ -1,6 +1,6 @@
 ---
 description: Optimize ad operations, policy compliance, and RPM with CLS-safe placements and measurable revenue reporting.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input

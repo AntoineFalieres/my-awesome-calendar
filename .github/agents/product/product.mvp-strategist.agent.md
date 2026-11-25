@@ -1,6 +1,6 @@
 ---
 description: Define and protect a lean MVP roadmap that maximizes speed to market, organic acquisition, and ad revenue while preventing feature creep.
-tools: ['changes']
+tools: ['changes', 'read', 'search']
 ---
 
 ## User Input
