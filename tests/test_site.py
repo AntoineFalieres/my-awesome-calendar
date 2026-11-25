@@ -108,7 +108,8 @@ class AdsAndConsentTests(SiteTestCase):
             self.assertNotIn("adsbygoogle", html)
 
     def test_ad_slots_render_only_with_client_id_and_cmp(self):
-        with patch.object(calendar_app, "ADSENSE_CLIENT_ID", "ca-pub-1234567890"):
+        with patch.object(calendar_app, "ADS_ENABLED", True), \
+                patch.object(calendar_app, "ADSENSE_CLIENT_ID", "ca-pub-1234567890"):
             without_cmp = self.client.get("/france/2026").get_data(as_text=True)
             with patch.object(calendar_app, "CMP_SCRIPT_URL", "https://cmp.example/loader.js"):
                 with_cmp = self.client.get("/france/2026").get_data(as_text=True)
@@ -122,19 +123,61 @@ class AdsAndConsentTests(SiteTestCase):
         self.assertNotIn("googlesyndication", with_cmp)
         self.assertNotIn("adsbygoogle", legal)
 
-    def test_production_rejects_placeholder_configuration(self):
-        with patch.object(calendar_app, "APP_ENV", "production"):
+    def test_production_rejects_placeholder_configuration_when_ads_enabled(self):
+        with patch.object(calendar_app, "APP_ENV", "production"), \
+                patch.object(calendar_app, "ADS_ENABLED", True), \
+                patch.object(calendar_app, "SITE_URL", "https://example.fr"):
             with self.assertRaises(RuntimeError) as context:
                 calendar_app.validate_production_config()
 
         self.assertIn("ADSENSE_CLIENT_ID", str(context.exception))
+        self.assertIn("CMP_SCRIPT_URL", str(context.exception))
         self.assertIn("ads.txt", str(context.exception))
+
+    def test_production_without_ads_skips_ad_checks_but_requires_site_url(self):
+        with patch.object(calendar_app, "APP_ENV", "production"), \
+                patch.object(calendar_app, "ADS_ENABLED", False):
+            with patch.object(calendar_app, "SITE_URL", "https://example.fr"):
+                calendar_app.validate_production_config()
+            with patch.object(calendar_app, "SITE_URL", ""):
+                with self.assertRaises(RuntimeError) as context:
+                    calendar_app.validate_production_config()
+
+        self.assertEqual(str(context.exception), "Invalid production configuration: SITE_URL is not set")
 
     def test_development_allows_placeholder_configuration(self):
         calendar_app.validate_production_config()
 
+    def test_ads_disabled_loads_no_ad_consent_or_measurement_code(self):
+        with patch.object(calendar_app, "ADS_ENABLED", False), \
+                patch.object(calendar_app, "ADSENSE_CLIENT_ID", "ca-pub-1234567890"), \
+                patch.object(calendar_app, "CMP_SCRIPT_URL", "https://cmp.example/loader.js"):
+            html = self.client.get("/france/2026").get_data(as_text=True)
+            ads_txt = self.client.get("/ads.txt")
+            metrics = self.client.post(
+                "/api/metrics/revenue",
+                data=json.dumps({"pageType": "calendar-home", "eventType": "page_view", "status": "viewed"}),
+                content_type="application/json",
+            )
+            with patch.object(calendar_app, "METRICS_TOKEN", "secret"):
+                summary = self.client.get("/api/metrics/revenue/summary", headers={"X-Metrics-Token": "secret"})
+
+        self.assertNotIn("cmp.example", html)
+        self.assertNotIn("data-open-consent", html)
+        self.assertNotIn("adsbygoogle", html)
+        self.assertIn('data-ads-enabled="0"', html)
+        self.assertIn('data-cmp-enabled="0"', html)
+        self.assertEqual((ads_txt.status_code, metrics.status_code, summary.status_code), (404, 404, 404))
+        self.assertEqual(calendar_app.REVENUE_EVENT_COUNTS, {})
+
 
 class MetricsEndpointTests(SiteTestCase):
+    def setUp(self):
+        super().setUp()
+        ads_enabled = patch.object(calendar_app, "ADS_ENABLED", True)
+        ads_enabled.start()
+        self.addCleanup(ads_enabled.stop)
+
     def post_event(self, payload, **kwargs):
         return self.client.post("/api/metrics/revenue", data=json.dumps(payload), content_type="application/json", **kwargs)
 
