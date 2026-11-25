@@ -45,8 +45,9 @@ class FranceNameDaysTests(unittest.TestCase):
             [{"day": 1, "month": 1, "fr": "Jour de l'An"}]
         ).encode()
 
-        with calendar_app.app.test_client() as client:
-            response = client.get("/api/name-days/france/2026")
+        with patch.object(calendar_app, "NAME_DAYS_ENABLED", True):
+            with calendar_app.app.test_client() as client:
+                response = client.get("/api/name-days/france/2026")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.get_json()), 365)
@@ -56,11 +57,21 @@ class FranceNameDaysTests(unittest.TestCase):
     def test_name_day_api_returns_explicit_error_for_invalid_payload(self, urlopen_mock):
         urlopen_mock.return_value.__enter__.return_value.read.return_value = b"{}"
 
-        with calendar_app.app.test_client() as client:
-            response = client.get("/api/name-days/france/2026")
+        with patch.object(calendar_app, "NAME_DAYS_ENABLED", True):
+            with calendar_app.app.test_client() as client:
+                response = client.get("/api/name-days/france/2026")
 
         self.assertEqual(response.status_code, 502)
         self.assertIn("error", response.get_json())
+
+    @patch("app.fetch_fr_name_days")
+    def test_name_day_endpoint_is_disabled_by_default_setting(self, fetch_mock):
+        with patch.object(calendar_app, "NAME_DAYS_ENABLED", False):
+            with calendar_app.app.test_client() as client:
+                response = client.get("/api/name-days/france/2026")
+
+        self.assertEqual(response.status_code, 404)
+        fetch_mock.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -237,6 +237,20 @@ class FrenchDateTests(unittest.TestCase):
 
 
 class HomePageTests(SiteTestCase):
+    def test_name_days_are_hidden_by_default(self):
+        with patch.object(calendar_app, "NAME_DAYS_ENABLED", False):
+            html = self.client.get("/").get_data(as_text=True)
+
+        self.assertIn("const NAME_DAYS_ENABLED = false;", html)
+        self.assertIn("if (NAME_DAYS_ENABLED)", html)
+
+    def test_name_days_can_be_enabled_for_the_calendar(self):
+        with patch.object(calendar_app, "NAME_DAYS_ENABLED", True):
+            html = self.client.get("/").get_data(as_text=True)
+
+        self.assertIn("const NAME_DAYS_ENABLED = true;", html)
+        self.assertIn("Saint du jour :", html)
+
     def test_home_page_links_to_crawlable_year_pages(self):
         html = self.client.get("/").get_data(as_text=True)
 
