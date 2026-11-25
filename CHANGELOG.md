@@ -5,6 +5,8 @@
 <!-- AUTO-CHANGELOG-UPDATES:START -->
 ### Merged PR entries
 
+- 2026-11-25 - PR #24: Dev (Roles: SEO, UX/UI, Full-Stack, Ad Ops) https://github.com/AntoineFalieres/my-awesome-calendar/pull/24 <!-- AUTO-PR:24 -->
+
 - 2026-10-31 - PR #18: feat(calendar): add daily date and saint-name views (Roles: UX/UI, Full-Stack) https://github.com/AntoineFalieres/my-awesome-calendar/pull/18 <!-- AUTO-PR:18 -->
 - 2026-10-31 - PR #16: chore(agentic): add Anthropic frontend design skill (Roles: PM, SEO, UX/UI) https://github.com/AntoineFalieres/my-awesome-calendar/pull/16 <!-- AUTO-PR:16 -->
 - 2026-10-28 - PR #14: docs(github): add caveman commit skill (Roles: UX/UI) https://github.com/AntoineFalieres/my-awesome-calendar/pull/14 <!-- AUTO-PR:14 -->

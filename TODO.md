@@ -105,4 +105,8 @@
 - [ ] **UX/UI:** review readability and interaction impact from merged PR #16. <!-- AUTO-PR:16;ROLE:UX/UI -->
 - [ ] **UX/UI:** review readability and interaction impact from merged PR #18. <!-- AUTO-PR:18;ROLE:UX/UI -->
 - [ ] **Full-Stack:** validate implementation consistency from merged PR #18. <!-- AUTO-PR:18;ROLE:Full-Stack -->
+- [ ] **SEO:** review metadata/indexability implications from merged PR #24. <!-- AUTO-PR:24;ROLE:SEO -->
+- [ ] **UX/UI:** review readability and interaction impact from merged PR #24. <!-- AUTO-PR:24;ROLE:UX/UI -->
+- [ ] **Full-Stack:** validate implementation consistency from merged PR #24. <!-- AUTO-PR:24;ROLE:Full-Stack -->
+- [ ] **Ad Ops:** review monetization/compliance implications from merged PR #24. <!-- AUTO-PR:24;ROLE:Ad Ops -->
 <!-- AUTO-TODO-UPDATES:END -->
