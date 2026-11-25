@@ -7,7 +7,7 @@ A comprehensive, interactive holiday and school calendar application that displa
 - 🌍 **200+ Countries Supported** - View public holidays for countries worldwide
 - 🗺️ **Regional Subdivisions** - Select state/province/regional holidays (US states, Canadian provinces, German Bundesländer, etc.)
 - 🏫 **French School Holidays** - Dedicated support for French school holidays by zone (A, B, C)
-- ✨ **French Name Days** - Display the French saint/name day alongside every date
+- ✨ **French Name Days** - Optional French saint/name-day labels alongside calendar dates
 - 📅 **Flexible Views** - Switch between Week, Month, Semester, and Year calendar views
 - 🌞 **Monday Start** - Calendar weeks start on Monday
 - ⚡ **Real-time Updates** - Dynamically load holidays based on country/region/year selection
@@ -57,7 +57,7 @@ A comprehensive, interactive holiday and school calendar application that displa
 
 ### Calendar Features
 
-- **Week, Month, Semester, and Year Views**: Daily rows show the weekday, date, and French name day in each range
+- **Week, Month, Semester, and Year Views**: Daily rows show weekday and date; French name days are optional
 - **Holiday Labels**: Public holidays and available school-holiday periods appear alongside their dates
 - **Navigation**: Use Previous/Next buttons to move between periods
 - **Today Button**: Jump back to the current period
@@ -184,6 +184,7 @@ All values are environment-driven:
 
 - `SITE_URL` (example: `https://calendar.example.fr`): base URL for canonical links, the sitemap and robots.txt. Falls back to the request host.
 - `ADS_ENABLED` (default `false`; accepts `1`/`true`/`yes`/`on`): master switch for ads, the consent manager, `/ads.txt` and revenue measurement. When false, no ad, CMP or measurement scripts load, and `/ads.txt` and `/api/metrics/*` return 404.
+- `NAME_DAYS_ENABLED` (default `false`; accepts `1`/`true`/`yes`/`on`): enables French saint/name-day labels in the calendar and the `/api/name-days/france/<year>` endpoint. When false, the endpoint returns 404 and the browser does not request name-day data.
 - `APP_ENV`: set to `production` to refuse startup when `SITE_URL` is missing or, with `ADS_ENABLED` on, when ad or consent settings are placeholders.
 - `ADSENSE_CLIENT_ID` (example: `ca-pub-1234567890`)
 - `ADSENSE_SLOT_INLINE`

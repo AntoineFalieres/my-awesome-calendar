@@ -17,7 +17,7 @@
 - [ ] **Full-Stack:** resolve the PR #24 (`dev` to `main`) conflicts in
   `app.py` and `templates/index.html` after the `ADS_ENABLED` change, and add
   CI checks so launch changes are validated before merge.
-- [ ] **Full-Stack + PM:** disable the saint-name views by default for launch
+- [x] **Full-Stack + PM:** disable the saint-name views by default for launch
   behind a `NAME_DAYS_ENABLED` setting (default false); they are not a Step 1
   requirement.
 - [ ] Verify available France public and school-holiday dates for zones A/B/C

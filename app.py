@@ -28,6 +28,8 @@ SITE_URL = os.getenv("SITE_URL", "").rstrip("/")
 APP_ENV = os.getenv("APP_ENV", "development").lower()
 # Master switch for ads, the consent manager, ads.txt and revenue measurement.
 ADS_ENABLED = os.getenv("ADS_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
+# Name-day views are not part of the public launch scope.
+NAME_DAYS_ENABLED = os.getenv("NAME_DAYS_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-XXXXXXXXXXXXXXXX")
 ADSENSE_SLOT_INLINE = os.getenv("ADSENSE_SLOT_INLINE", "2222222222")
 ADSENSE_SLOT_FOOTER = os.getenv("ADSENSE_SLOT_FOOTER", "3333333333")
@@ -473,6 +475,7 @@ def index():
         current_year=get_current_france_year(),
         france_years=FRANCE_SEO_YEARS,
         school_years=get_school_holiday_years(),
+        name_days_enabled=NAME_DAYS_ENABLED,
     )
 
 
@@ -703,6 +706,8 @@ def get_france_holidays(year):
 @app.route('/api/name-days/france/<int:year>')
 def get_france_name_days(year):
     """Return French name-day labels for a calendar year."""
+    if not NAME_DAYS_ENABLED:
+        abort(404)
     try:
         return jsonify(fetch_fr_name_days(year))
     except ValueError as error:

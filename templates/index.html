@@ -228,6 +228,7 @@
         const bannerNextLabel = document.getElementById("banner-next-year-label");
         const FIRST_YEAR = 2025;
         const LAST_YEAR = 2030;
+        const NAME_DAYS_ENABLED = {{ name_days_enabled|tojson }};
         const SCHOOL_ZONES = ["A", "B", "C"];
         const SCHOOL_YEARS = {{ school_years|tojson }};
         const calendarViewButtons = document.querySelectorAll("[data-calendar-view]");
@@ -628,6 +629,9 @@
 
         // The name-day source sometimes repeats a holiday title; hide it to avoid showing it twice.
         function getSaint(dayKey) {
+            if (!NAME_DAYS_ENABLED) {
+                return "";
+            }
             const saint = (calendarData.namesByDate.get(dayKey) || "").trim();
             const normalized = saint.toLocaleLowerCase("fr-FR");
             const duplicatesEvent = (calendarData.eventsByDate.get(dayKey) || []).some(
@@ -756,7 +760,9 @@
                 head.append(dayName, dayNumber, createElement("span", "visually-hidden", formatLongDate(day)));
 
                 const body = createElement("div", "cal-week-body");
-                body.appendChild(createElement("div", "cal-saint", getSaint(dayKey)));
+                if (NAME_DAYS_ENABLED) {
+                    body.appendChild(createElement("div", "cal-saint", getSaint(dayKey)));
+                }
                 const allDay = createElement("div", "cal-allday");
                 allDay.setAttribute("role", "group");
                 allDay.setAttribute("aria-label", "Toute la journée");
@@ -879,12 +885,14 @@
             }
             const day = parseDateKey(selectedDateKey);
             dayDetail.appendChild(createElement("h3", "cal-detail-title", formatLongDate(day)));
-            const saint = getSaint(selectedDateKey);
-            dayDetail.appendChild(createElement(
-                "p",
-                "cal-detail-saint",
-                saint ? `Saint du jour : ${saint}` : "Saint du jour indisponible"
-            ));
+            if (NAME_DAYS_ENABLED) {
+                const saint = getSaint(selectedDateKey);
+                dayDetail.appendChild(createElement(
+                    "p",
+                    "cal-detail-saint",
+                    saint ? `Saint du jour : ${saint}` : "Saint du jour indisponible"
+                ));
+            }
             const dayEvents = calendarData.eventsByDate.get(selectedDateKey) || [];
             if (dayEvents.length === 0) {
                 dayDetail.appendChild(createElement("p", "mb-0", "Aucun jour férié ni vacances scolaires."));
@@ -949,9 +957,11 @@
 
         async function fetchYearCalendarData(year) {
             const requests = [
-                fetchJson(`/api/holidays/france/${year}`),
-                fetchJson(`/api/name-days/france/${year}`)
+                fetchJson(`/api/holidays/france/${year}`)
             ];
+            if (NAME_DAYS_ENABLED) {
+                requests.push(fetchJson(`/api/name-days/france/${year}`));
+            }
             if (SCHOOL_YEARS.includes(year)) {
                 SCHOOL_ZONES.forEach((zone) => {
                     requests.push(fetchJson(`/api/school-holidays/FR/${year}?zone=${zone}`));
@@ -976,16 +986,20 @@
             const errors = [];
             yearResults.forEach((results, index) => {
                 const year = years[index];
-                const [publicResult, nameDaysResult, ...schoolResults] = results;
+                const publicResult = results[0];
+                const nameDaysResult = NAME_DAYS_ENABLED ? results[1] : null;
+                const schoolResults = results.slice(NAME_DAYS_ENABLED ? 2 : 1);
                 if (publicResult.status === "fulfilled") {
                     events.push(...publicResult.value);
                 } else {
                     errors.push(`Jours fériés ${year} : ${publicResult.reason.message || "données indisponibles"}.`);
                 }
-                if (nameDaysResult.status === "fulfilled") {
-                    nameDays.push(...nameDaysResult.value);
-                } else {
-                    errors.push(`Saints ${year} : ${nameDaysResult.reason.message || "données indisponibles"}.`);
+                if (NAME_DAYS_ENABLED) {
+                    if (nameDaysResult.status === "fulfilled") {
+                        nameDays.push(...nameDaysResult.value);
+                    } else {
+                        errors.push(`Saints ${year} : ${nameDaysResult.reason.message || "données indisponibles"}.`);
+                    }
                 }
                 schoolResults.forEach((schoolResult) => {
                     if (schoolResult.status === "fulfilled") {
