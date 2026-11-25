@@ -70,6 +70,12 @@
 - [ ] Evaluate premium ad networks after eligibility thresholds.
 - [ ] Evaluate paid data providers only after MVP revenue validation.
 
+## Idea box
+
+- Add a link to a calendar seller website that allows sponsorship.
+- Add a horoscope section.
+- Add an "on-going events" section.
+
 ## Agent handoff workflow
 
 1. PM defines scope and acceptance criteria.
