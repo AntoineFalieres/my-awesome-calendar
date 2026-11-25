@@ -183,14 +183,15 @@ Sitemap of every crawlable page with content (school-holiday pages exist only fo
 All values are environment-driven:
 
 - `SITE_URL` (example: `https://calendar.example.fr`): base URL for canonical links, the sitemap and robots.txt. Falls back to the request host.
-- `APP_ENV`: set to `production` to refuse startup when ad or consent settings are placeholders.
+- `ADS_ENABLED` (default `false`; accepts `1`/`true`/`yes`/`on`): master switch for ads, the consent manager, `/ads.txt` and revenue measurement. When false, no ad, CMP or measurement scripts load, and `/ads.txt` and `/api/metrics/*` return 404.
+- `APP_ENV`: set to `production` to refuse startup when `SITE_URL` is missing or, with `ADS_ENABLED` on, when ad or consent settings are placeholders.
 - `ADSENSE_CLIENT_ID` (example: `ca-pub-1234567890`)
 - `ADSENSE_SLOT_INLINE`
 - `ADSENSE_SLOT_FOOTER`
 - `CMP_SCRIPT_URL`: loader script of a Google-certified TCF consent management platform.
 - `METRICS_TOKEN`: enables the metrics summary endpoint.
 
-Ads render only when `ADSENSE_CLIENT_ID` is a real value **and** `CMP_SCRIPT_URL` is set. The AdSense script is injected by `static/site.js` only after the CMP reports consent (TCF purpose 1; analytics events need purposes 7 and 8; personalized ads need purposes 1, 3 and 4, otherwise non-personalized requests are made). Ads are never shown on legal pages. In production, `ads.txt` must also contain a real publisher ID.
+Ads render only when `ADS_ENABLED` is on, `ADSENSE_CLIENT_ID` is a real value **and** `CMP_SCRIPT_URL` is set. The AdSense script is injected by `static/site.js` only after the CMP reports consent (TCF purpose 1; analytics events need purposes 7 and 8; personalized ads need purposes 1, 3 and 4, otherwise non-personalized requests are made). Ads are never shown on legal pages. In production with `ADS_ENABLED` on, `ads.txt` must also contain a real publisher ID.
 
 ## 🤖 Planning Docs Automation
 

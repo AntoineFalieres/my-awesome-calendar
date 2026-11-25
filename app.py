@@ -26,6 +26,8 @@ FRANCE_SEO_YEARS = tuple(range(2025, 2031))
 SITE_NAME = "Calendrier France"
 SITE_URL = os.getenv("SITE_URL", "").rstrip("/")
 APP_ENV = os.getenv("APP_ENV", "development").lower()
+# Master switch for ads, the consent manager, ads.txt and revenue measurement.
+ADS_ENABLED = os.getenv("ADS_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-XXXXXXXXXXXXXXXX")
 ADSENSE_SLOT_INLINE = os.getenv("ADSENSE_SLOT_INLINE", "2222222222")
 ADSENSE_SLOT_FOOTER = os.getenv("ADSENSE_SLOT_FOOTER", "3333333333")
@@ -257,11 +259,12 @@ def is_placeholder_value(value):
 def get_ad_config():
     """Return ad configuration for template rendering.
 
-    Ads render only with a real AdSense client ID and a configured CMP, because
-    ads must stay disabled until a consent signal can be honored.
+    Ads render only when ADS_ENABLED is set, with a real AdSense client ID and a
+    configured CMP, because ads must stay disabled until a consent signal can be
+    honored.
     """
     return {
-        "enabled": not is_placeholder_value(ADSENSE_CLIENT_ID) and bool(CMP_SCRIPT_URL),
+        "enabled": ADS_ENABLED and not is_placeholder_value(ADSENSE_CLIENT_ID) and bool(CMP_SCRIPT_URL),
         "client_id": ADSENSE_CLIENT_ID,
         "slot_inline": ADSENSE_SLOT_INLINE,
         "slot_footer": ADSENSE_SLOT_FOOTER,
@@ -274,18 +277,19 @@ def validate_production_config():
         return
 
     problems = []
-    if is_placeholder_value(ADSENSE_CLIENT_ID):
-        problems.append("ADSENSE_CLIENT_ID is missing or a placeholder")
-    if not CMP_SCRIPT_URL:
-        problems.append("CMP_SCRIPT_URL is not set")
     if not SITE_URL:
         problems.append("SITE_URL is not set")
-    try:
-        with open(os.path.join(app.root_path, "ads.txt"), encoding="utf-8") as ads_file:
-            if ADS_TXT_PLACEHOLDER_MARKER in ads_file.read().upper():
-                problems.append("ads.txt still contains a placeholder publisher ID")
-    except OSError:
-        problems.append("ads.txt is missing")
+    if ADS_ENABLED:
+        if is_placeholder_value(ADSENSE_CLIENT_ID):
+            problems.append("ADSENSE_CLIENT_ID is missing or a placeholder")
+        if not CMP_SCRIPT_URL:
+            problems.append("CMP_SCRIPT_URL is not set")
+        try:
+            with open(os.path.join(app.root_path, "ads.txt"), encoding="utf-8") as ads_file:
+                if ADS_TXT_PLACEHOLDER_MARKER in ads_file.read().upper():
+                    problems.append("ads.txt still contains a placeholder publisher ID")
+        except OSError:
+            problems.append("ads.txt is missing")
 
     if problems:
         raise RuntimeError("Invalid production configuration: " + "; ".join(problems))
@@ -376,7 +380,7 @@ def inject_site_context():
         "canonical_url": build_site_url(request.path),
         "site_name": SITE_NAME,
         "france_year": get_current_france_year(),
-        "cmp_script_url": CMP_SCRIPT_URL,
+        "cmp_script_url": CMP_SCRIPT_URL if ADS_ENABLED else "",
     }
 
 
@@ -597,6 +601,8 @@ def france_school_holidays_page(year, zone):
 @app.route('/ads.txt')
 def ads_txt():
     """Serve ads.txt from the repository root."""
+    if not ADS_ENABLED:
+        abort(404)
     return send_from_directory(app.root_path, 'ads.txt', mimetype='text/plain')
 
 
@@ -725,6 +731,8 @@ def get_school_holidays(country_code, year):
 @app.route('/api/metrics/revenue', methods=['POST'])
 def track_revenue_event():
     """Collect route/template-level revenue tracking events."""
+    if not ADS_ENABLED:
+        abort(404)
     if is_metrics_rate_limited(request.remote_addr or "unknown"):
         return jsonify({'error': 'Too many requests'}), 429
 
@@ -744,7 +752,7 @@ def track_revenue_event():
 def revenue_summary():
     """Expose in-memory revenue event counters for diagnostics, behind METRICS_TOKEN."""
     provided_token = request.headers.get('X-Metrics-Token', '')
-    if not METRICS_TOKEN or not hmac.compare_digest(provided_token, METRICS_TOKEN):
+    if not ADS_ENABLED or not METRICS_TOKEN or not hmac.compare_digest(provided_token, METRICS_TOKEN):
         abort(404)
 
     summary = []
